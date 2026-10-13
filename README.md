@@ -34,7 +34,27 @@ Forza Horizon 4 previously failed on Apple Silicon at three critical checkpoints
 
 ### Installation
 
-The patch binaries and install tools are already in `working-patches/`; there is no patch ZIP to extract. Use the [manual installation guide](working-patches/MANUAL_INSTALLATION.md) for the captured CrossOver 26.3 build and Steam bottle. Review its expected hashes, backup instructions, and configuration before making changes. Do not apply these binaries to another CrossOver release.
+The patch binaries and install tools are located in `working-patches/`. Choose between automated AI-assisted deployment (Method A) or manual step-by-step terminal installation (Method B). Review the expected hashes and configuration before making changes. Do not apply these binaries to another CrossOver release.
+
+---
+
+### Method A: Install with AI (Recommended)
+
+If you are using an AI coding assistant (such as Antigravity, Cursor, Claude Code, or GitHub Copilot):
+
+1. **Place Patches / Open Project:** Open this repository in your AI coding assistant workspace. If downloading a release archive (e.g., `patches.zip`), drop the zip file inside the `working-patches/` folder (or use the pre-extracted files already present in `working-patches/`).
+2. **Quit CrossOver:** Completely quit CrossOver and ensure all bottle processes are stopped.
+3. **Prompt the AI:** Copy and paste the following prompt into your AI coding assistant:
+
+> *"Please apply the Forza Horizon 4 patches to my CrossOver Steam bottle and CrossOver engine following the instructions in `working-patches/MANUAL_INSTALLATION.md`. If a patches zip file is present in `working-patches/`, extract it first. Back up existing files, deploy the patched `kernelbase.dll` and `d3d12.dll`, ensure `apd12.dll` is present, configure the `cxbottle.conf` environment variables, and verify file checksums."*
+
+The AI assistant will autonomously:
+- Auto-detect your CrossOver application (`$CX`) and Steam bottle (`$BOTTLE`) paths.
+- Create timestamped safety backups (`*.bak_fh4_archive_*` and `cxbottle.conf.bak`).
+- Deploy the patched `kernelbase.dll` (launch / DRM loop fix) and `d3d12.dll` (vertex stride fix & VEH open-world crash bypass).
+- Verify the D3DMetal provider (`apd12.dll`) and Unix symlinks.
+- Configure `cxbottle.conf` environment variables (`CX_GRAPHICS_BACKEND`, `HB_D3D12_REAL`, `HB_TSSHIM_EXPLICIT_INPUT_OFFSETS=1`, `HB_TSSHIM_FIX_WORLD_ENTRY=1`).
+- Run checksum verification against `working-patches/SHA256SUMS` to confirm a successful installation.
 
 ---
 
