@@ -1,0 +1,366 @@
+{
+  "schema": 1,
+  "captured_at": "2026-10-12T16:00:44.097465+05:30",
+  "files": {
+    "01-launch-package/README.md": {
+      "type": "file",
+      "size": 1715,
+      "sha256": "a3da505998876a96a2f17d5cdcd6e0a07ba417f2b93b17c82f8ed43e79c8c7fb",
+      "source": "generated"
+    },
+    "01-launch-package/binaries/kernelbase.dll": {
+      "type": "file",
+      "size": 2716240,
+      "sha256": "313a9d07019422fe0f56a579667d005d756728e13b66329aaa15321d92b0f182",
+      "source": "/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/lib/wine/x86_64-windows/kernelbase.dll"
+    },
+    "02-rendering/README.md": {
+      "type": "file",
+      "size": 2916,
+      "sha256": "d6592f6b45041d428dcfe37c0ab2136a6de7e35958ba95868165ec7cdbd2124f",
+      "source": "generated"
+    },
+    "02-rendering/bottle/apd12.dll": {
+      "type": "file",
+      "size": 196608,
+      "sha256": "f1bcaa4d79e4353e075e7f284ebcb2d44a1b0cb2aa88f01f6341dc3c518b976f",
+      "source": "${HOME}/Library/Application Support/CrossOver/Bottles/Steam/drive_c/windows/system32/apd12.dll"
+    },
+    "02-rendering/bottle/d3d12.dll": {
+      "type": "file",
+      "size": 281501,
+      "sha256": "facc38fb8affbf579153bcc54de3b063fb99fd9be1513988f9e2eda1ee8ad1e6",
+      "source": "${HOME}/Library/Application Support/CrossOver/Bottles/Steam/drive_c/windows/system32/d3d12.dll"
+    },
+    "02-rendering/source/binding_capture.h": {
+      "type": "file",
+      "size": 9078,
+      "sha256": "6374aa6e0780b190dfca3b72626563e3d74e3c0707810384b59acd98317a4e5f",
+      "source": "${GAME_ROOT}/highball_repo/spike/tsshim/binding_capture.h"
+    },
+    "02-rendering/source/d3d12.c": {
+      "type": "file",
+      "size": 142901,
+      "sha256": "769648db4fb5ef9b8e1f8ef08fd18fbdbeb2e47f3a242f55e7fa31985688ad90",
+      "source": "${GAME_ROOT}/highball_repo/spike/tsshim/d3d12.c"
+    },
+    "02-rendering/source/d3d12.def": {
+      "type": "file",
+      "size": 446,
+      "sha256": "b9566216f9b5d20ee48e24cd3fbd7c563b1b55e26520bf34f748d357684ea467",
+      "source": "${GAME_ROOT}/highball_repo/spike/tsshim/d3d12.def"
+    },
+    "02-rendering/source/descriptor_capture.h": {
+      "type": "file",
+      "size": 9611,
+      "sha256": "db2b63de3e68e26a32900dfe7374fa8f2db9c5806c9059d45a43300afb6fdd75",
+      "source": "${GAME_ROOT}/highball_repo/spike/tsshim/descriptor_capture.h"
+    },
+    "02-rendering/source/input_offsets.h": {
+      "type": "file",
+      "size": 6327,
+      "sha256": "37923dd72872e9135410f410dd9a06e385d218f786efdb4f4955f59e5e886b9f",
+      "source": "${GAME_ROOT}/highball_repo/spike/tsshim/input_offsets.h"
+    },
+    "02-rendering/source/mark-builtin.py": {
+      "type": "file",
+      "size": 460,
+      "sha256": "7840ea87af10e8f085f447476afe1129db5dfe037d60e3bff767276ea25daf90",
+      "source": "${GAME_ROOT}/highball_repo/Scripts/mark-builtin.py"
+    },
+    "02-rendering/source/probe.c": {
+      "type": "file",
+      "size": 23943,
+      "sha256": "3de03db7c22aa8daa1c2d80bf8dc420ccb8f544a0bf03bf797d7f95f3ba278d5",
+      "source": "${GAME_ROOT}/highball_repo/spike/tsshim/probe.c"
+    },
+    "02-rendering/source/upload_capture.h": {
+      "type": "file",
+      "size": 8788,
+      "sha256": "adcd719995ce4cf66e01dce2a9fe3eceb4de404293141c4c810077010db8d1a0",
+      "source": "${GAME_ROOT}/highball_repo/spike/tsshim/upload_capture.h"
+    },
+    "02-rendering/verification/probe.c": {
+      "type": "file",
+      "size": 23943,
+      "sha256": "3de03db7c22aa8daa1c2d80bf8dc420ccb8f544a0bf03bf797d7f95f3ba278d5",
+      "source": "${GAME_ROOT}/highball_repo/spike/tsshim/probe.c"
+    },
+    "02-rendering/verification/probe_vertex_formats.c": {
+      "type": "file",
+      "size": 14108,
+      "sha256": "b7f9a60cba14bdff8f6ca9223a797876be293f5eddd7551b7a399d9a395489e9",
+      "source": "${GAME_ROOT}/diagnostics/2026-10-11/probe_vertex_formats.c"
+    },
+    "02-rendering/verification/test_input_offsets.c": {
+      "type": "file",
+      "size": 4908,
+      "sha256": "92c34930118d8055c8293e44b26205962488e53215eef3d292a6d501ae409cef",
+      "source": "${GAME_ROOT}/diagnostics/2026-10-11/test_input_offsets.c"
+    },
+    "03-settings/README.md": {
+      "type": "file",
+      "size": 1526,
+      "sha256": "f17a090503e58b6e93c01ca47c4ecf1e2d3cf58b164769ccd671fe1c7d480f09",
+      "source": "generated"
+    },
+    "03-settings/cxbottle.conf.snapshot": {
+      "type": "file",
+      "size": 14641,
+      "sha256": "bebdcac1467466073a50efeb68573b5ab9de345b336fd204222c714f5fe08621",
+      "source": "${HOME}/Library/Application Support/CrossOver/Bottles/Steam/cxbottle.conf"
+    },
+    "03-settings/game/UserConfigSelections": {
+      "type": "file",
+      "size": 9657,
+      "sha256": "9f5f5ccefa7d838035f0ac1e817f75d3da4c8bfbd7a0a0650a4883e16d78f841",
+      "source": "${HOME}/Library/Application Support/CrossOver/Bottles/Steam/drive_c/users/crossover/AppData/Local/ForzaHorizon4/User_PCLocalStorageDirectory/ConnectedStorage/ForzaUserConfigSelections/UserConfigSelections"
+    },
+    "03-settings/skip.txt": {
+      "type": "file",
+      "size": 51,
+      "sha256": "7a8ea11d5bd630559e1d80957e05c5fa134ae4e653945357f74eb998154dd8b0",
+      "source": "${HOME}/Library/Application Support/CrossOver/Bottles/Steam/drive_c/highball/skip.txt"
+    },
+    "03-settings/wine-registry-reference.txt": {
+      "type": "file",
+      "size": 2170,
+      "sha256": "bbd4b6870450ff1a2f844d6eee0754f05f3886ca26dc8ce99f1cd5465a91420b",
+      "source": "generated"
+    },
+    "04-shader-lab/README.md": {
+      "type": "file",
+      "size": 8149,
+      "sha256": "4d55c0b5a5a8989359220b0d0da9e1527bf588b51a3c8ee9318d8446847ab87c",
+      "source": "${GAME_ROOT}/shader_lab/README.md"
+    },
+    "04-shader-lab/Shader Lab.command": {
+      "type": "file",
+      "size": 1433,
+      "sha256": "37ab1744f07480694ffd3d0f8a20069780d0823d27a03a125bb45db9f26461d7",
+      "source": "${GAME_ROOT}/shader_lab/Shader Lab.command"
+    },
+    "04-shader-lab/shader_lab.py": {
+      "type": "file",
+      "size": 27531,
+      "sha256": "06e0a5c6948f76dcd81853b2d95e9c1a8ef50870f7f2a616762ef042279ef853",
+      "source": "${GAME_ROOT}/shader_lab/shader_lab.py"
+    },
+    "04-shader-lab/test_shader_lab.py": {
+      "type": "file",
+      "size": 12740,
+      "sha256": "d7e82339ce7881d16b654181fa30c93194c1e2f369f70148f70586b43dd94e04",
+      "source": "${GAME_ROOT}/shader_lab/test_shader_lab.py"
+    },
+    "05-game-support/ClockSkew.json": {
+      "type": "file",
+      "size": 19,
+      "sha256": "4378fc1426f4f53fafe94a3223295a2796e93864ac681673b3a3b7d5f16d77b1",
+      "source": "${GAME_ROOT}/ClockSkew.json"
+    },
+    "05-game-support/Enable_Invites_FH4.bat": {
+      "type": "file",
+      "size": 648,
+      "sha256": "db1cf6461bf8af8da2eed1522a133efa237726fa21979ca32e5548405ce018cf",
+      "source": "${GAME_ROOT}/Enable_Invites_FH4.bat"
+    },
+    "05-game-support/OnlineFix.ini": {
+      "type": "file",
+      "size": 10244,
+      "sha256": "00513fdf054b3bc0a3e5d369d87bb2abf5076af9e5c227d2d2a9809bb06130d5",
+      "source": "${GAME_ROOT}/OnlineFix.ini"
+    },
+    "05-game-support/OnlineFix64.dll": {
+      "type": "file",
+      "size": 2032240,
+      "sha256": "28488afc3e1ac0b47ebe80dea052acaf53c183bcdf07e3cfcda6ffa67d14e346",
+      "source": "${GAME_ROOT}/OnlineFix64.dll"
+    },
+    "05-game-support/README.md": {
+      "type": "file",
+      "size": 1534,
+      "sha256": "9bb841df4e3864ac1863f449492324c3c3e39f39948e48bba7b1d147d083fa8d",
+      "source": "generated"
+    },
+    "05-game-support/dxva2.dll": {
+      "type": "file",
+      "size": 370727,
+      "sha256": "1a138a0a2213edfe06d93fadb40ea4c85f9963d2a9c4ec12b4aa8fc3bca0d3be",
+      "source": "${GAME_ROOT}/dxva2.dll"
+    },
+    "05-game-support/steam_api64.dll": {
+      "type": "file",
+      "size": 262944,
+      "sha256": "2528c74091166068a466ac2e4a3f29bd1e4c29844d89c7177c4336f4cc3cf8be",
+      "source": "${GAME_ROOT}/steam_api64.dll"
+    },
+    "05-game-support/steam_api64.of": {
+      "type": "file",
+      "size": 262944,
+      "sha256": "473f5a312b56519f347741b63f3dea590946b96ea40ef3803d5f452c39af2f1e",
+      "source": "${GAME_ROOT}/steam_api64.of"
+    },
+    "05-game-support/steam_settings/DLC.txt": {
+      "type": "file",
+      "size": 3082,
+      "sha256": "2993d96db2dfdf1067d30de661301f54cd3bf8888848dc2d984dbf397cc23d2f",
+      "source": "${GAME_ROOT}/steam_settings/DLC.txt"
+    },
+    "05-game-support/steam_settings/achievements.json": {
+      "type": "file",
+      "size": 47446,
+      "sha256": "66ef1897990a9724aa31c0a1aa4615281e4127fab10a7c85a2153d2eccd30978",
+      "source": "${GAME_ROOT}/steam_settings/achievements.json"
+    },
+    "05-game-support/steam_settings/disable_networking.txt": {
+      "type": "file",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "${GAME_ROOT}/steam_settings/disable_networking.txt"
+    },
+    "05-game-support/steam_settings/disable_overlay.txt": {
+      "type": "file",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "${GAME_ROOT}/steam_settings/disable_overlay.txt"
+    },
+    "05-game-support/steam_settings/load_dlls/xlive64.dll": {
+      "type": "file",
+      "size": 540160,
+      "sha256": "298f6d27ffba4c5edc6c18e2f04b8fccefd4c877662eaa4039bc899072d64a7d",
+      "source": "${GAME_ROOT}/steam_settings/load_dlls/xlive64.dll"
+    },
+    "05-game-support/steam_settings/steam_appid.txt": {
+      "type": "file",
+      "size": 7,
+      "sha256": "60a88731134197b6c8f2d548907df7ffa26bc469d321363f9e99167e98ebe04b",
+      "source": "${GAME_ROOT}/steam_settings/steam_appid.txt"
+    },
+    "05-game-support/uiautomationcore.dll": {
+      "type": "file",
+      "size": 923626,
+      "sha256": "65ea8314dd13a3a1e34aadfcd10ce51414f3b95f1309fae704b81141c1656d78",
+      "source": "${GAME_ROOT}/uiautomationcore.dll"
+    },
+    "05-game-support/xrnm.dll": {
+      "type": "file",
+      "size": 395264,
+      "sha256": "8f7e8a44cc313d86bf7271beb2d4b3701146c858de12129f1e223f3b52e4127b",
+      "source": "${GAME_ROOT}/xrnm.dll"
+    },
+    "06-history/README.md": {
+      "type": "file",
+      "size": 1167,
+      "sha256": "8db723d23cf72653165a2e759beb5b0c9bd68986838d4eb70a6357b6dd143540",
+      "source": "generated"
+    },
+    "07-evidence/NOTICE.txt": {
+      "type": "file",
+      "size": 4251,
+      "sha256": "ae184d5a375532c52810e4f1ed618f094e52f88a7860f666b373690e92dcbcaf",
+      "source": "${GAME_ROOT}/NOTICE.txt"
+    },
+    "07-evidence/archive-validation.txt": {
+      "type": "file",
+      "size": 1016,
+      "sha256": "03eb2a106faaaf8dc5f7a605139a4155a8092e4f17e7d85d181d3bd6192d2962",
+      "source": "generated"
+    },
+    "07-evidence/changes_log.md": {
+      "type": "file",
+      "size": 56147,
+      "sha256": "3f0ec2bd12719d455eb718e491ff006e5c80dee1b24bf914677101284a482c6d",
+      "source": "${GAME_ROOT}/changes_log.md"
+    },
+    "07-evidence/diagnostic-deployment-README.md": {
+      "type": "file",
+      "size": 1091,
+      "sha256": "e7484c1083aaafffe4abe74f80d7ef1558dabf02b996515857573c8e3a949eee",
+      "source": "${GAME_ROOT}/diagnostics/2026-10-11/README.md"
+    },
+    "07-evidence/diagnostic-deployment.json": {
+      "type": "file",
+      "size": 2285,
+      "sha256": "ba448c1ced2e71a18d9a1d49a04a25108503dd172330bb67b8f2632baa707691",
+      "source": "${GAME_ROOT}/diagnostics/2026-10-11/deployment.json"
+    },
+    "07-evidence/forzahorizon.md": {
+      "type": "file",
+      "size": 7272,
+      "sha256": "3a289d493f2192c619c7a03a2b1c9502f82d864749145e90e27d4f8b7339bef7",
+      "source": "${GAME_ROOT}/forzahorizon.md"
+    },
+    "07-evidence/highball-LICENSE": {
+      "type": "file",
+      "size": 26419,
+      "sha256": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95",
+      "source": "${GAME_ROOT}/highball-engine/LICENSE"
+    },
+    "07-evidence/highball-NOTICE.md": {
+      "type": "file",
+      "size": 1365,
+      "sha256": "96ecffc2437d9728b3d748f4645682721609be8ee40f2cbc160eaccc558b7c0f",
+      "source": "${GAME_ROOT}/highball-engine/NOTICE.md"
+    },
+    "07-evidence/highball-repo-LICENSE": {
+      "type": "file",
+      "size": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "source": "${GAME_ROOT}/highball_repo/LICENSE"
+    },
+    "07-evidence/oct12-revert-audit.json": {
+      "type": "file",
+      "size": 2176,
+      "sha256": "0309ece9f0d00672bf3afdf1352c220105cca119e2a851b261da756ec5fe125f",
+      "source": "${GAME_ROOT}/diagnostics/2026-10-12/compatibility-investigation/revert-audit.json"
+    },
+    "07-evidence/snapshot-state.json": {
+      "type": "file",
+      "size": 47578,
+      "sha256": "6a68e4ed5da1548191251eeeb9efddb2da41b31ec6eeabe946bd924bd0edff0f",
+      "source": "generated"
+    },
+    "07-evidence/world-entry-crash-FINDINGS.md": {
+      "type": "file",
+      "size": 5834,
+      "sha256": "b23fa7092b04c1e1ba45d0b9a2c38f55b64fda7750327f9733561e72f4fa0f50",
+      "source": "${GAME_ROOT}/diagnostics/2026-10-12/world-restoration/FINDINGS.md"
+    },
+    "07-evidence/world-entry-veh-bypass.md": {
+      "type": "file",
+      "size": 5640,
+      "sha256": "3f47adc801f2405ac525872ef73adf221636112da845376068f6822b8514aedf",
+      "source": "${GAME_ROOT}/diagnostics/world-entry-20261012/STEP3_VEH_BYPASS.md"
+    },
+    "APPLY.md": {
+      "type": "file",
+      "size": 10696,
+      "sha256": "3c77f4f3a9431e0fc4168ecd35a463d109fd5cb4f0f4c511f78b12de41fc8b57",
+      "source": "generated"
+    },
+    "MANUAL_INSTALLATION.md": {
+      "type": "file",
+      "size": 4711,
+      "sha256": "6e14134b8a47843d51f8e6fff03400e842933914d3267484e1169a81738685d6",
+      "source": "generated"
+    },
+    "README.md": {
+      "type": "file",
+      "size": 5130,
+      "sha256": "bfd7af957fcf2136ad04218900d333578d82e2e85b8f555cd40d5455fd0bd3a5",
+      "source": "generated"
+    },
+    "tools/copy_checked.py": {
+      "type": "file",
+      "size": 3326,
+      "sha256": "627cb7278c53a294c6f4438c608145b2946e6460c816b5123346a9412a5aa816",
+      "source": "generated"
+    },
+    "tools/verify_archive.py": {
+      "type": "file",
+      "size": 1800,
+      "sha256": "e2b4c671d6967898320b91d3e365664d04362ac348b9d61ccce60b737e68c1c2",
+      "source": "generated"
+    }
+  }
+}

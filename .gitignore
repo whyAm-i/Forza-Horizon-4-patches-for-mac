@@ -1,0 +1,69 @@
+# OS metadata
+.DS_Store
+
+# Duplicate/obsolete root patch proposals
+/crossoverfh4boot.patch
+/highballfh4boot.patch
+
+# Historical launch patch artifacts and test binaries
+/working-patches/01-launch-package/reference/codecave.bin
+/working-patches/01-launch-package/reference/codecave.s
+/working-patches/01-launch-package/reference/test_package_compat.c
+/working-patches/01-launch-package/reference/test_package_compat.exe
+/working-patches/01-launch-package/reference/verify_live_patch.c
+/working-patches/01-launch-package/reference/verify_live_patch.exe
+
+# Superseded rendering snapshots and old build helper
+/working-patches/02-rendering/pre-offset-shim/
+/working-patches/02-rendering/previous-v4/
+/working-patches/02-rendering/previous-v5/
+/working-patches/02-rendering/reference/build-tsshim.sh
+/working-patches/02-rendering/verification/probe.exe
+/working-patches/02-rendering/verification/test_ord.exe
+
+# Old configuration backups and alternative registry export
+/working-patches/03-settings/game/UserConfigSelections.bak_baseline_20261010-223431
+/working-patches/03-settings/game/UserConfigSelections.bak_before_aggressive
+/working-patches/03-settings/game/UserConfigSelections.bak_before_crowd_suppression
+/working-patches/03-settings/game/UserConfigSelections.bak_before_render_rollback_20261010-215623
+/working-patches/03-settings/historical-retina-off.reg
+
+# Generated Shader Lab outputs marked old/stale
+/working-patches/04-shader-lab/data/last-bisection.json
+/working-patches/04-shader-lab/test-results.txt
+
+# Test records, results, and supporting experiment data
+/working-patches/02-rendering/verification/probe-vertex-formats-explicit-results.txt
+/working-patches/02-rendering/verification/probe-vertex-formats-shim-results.txt
+/working-patches/02-rendering/verification/test-input-offsets-results.txt
+/working-patches/02-rendering/verification/input-offset-verification.json
+/working-patches/02-rendering/verification/exports-binding-capture-v5.json
+/working-patches/04-shader-lab/data/observations.csv
+/working-patches/04-shader-lab/data/observations.json
+/working-patches/04-shader-lab/data/bisection-rounds.csv
+/working-patches/04-shader-lab/data/bisection-rounds.json
+/working-patches/04-shader-lab/data/catalog.json
+/working-patches/04-shader-lab/data/inventory.csv
+/working-patches/04-shader-lab/data/all-cs.txt
+/working-patches/04-shader-lab/data/all-vs.txt
+/working-patches/06-history/grass-water-comparison/README.md
+/working-patches/06-history/grass-water-comparison/probe-rg-snorm-results.txt
+/working-patches/06-history/grass-water-comparison/probe-rgb-float-results.txt
+/working-patches/06-history/grass-water-comparison/probe-rgba-half-results.txt
+/working-patches/06-history/grass-water-comparison/test-outlier-capture-results.txt
+/working-patches/06-history/grass-water-comparison/archive-matches.json
+/working-patches/06-history/grass-water-comparison/quality-settings.json
+/working-patches/06-history/grass-water-comparison/quality-settings.diff
+/working-patches/06-history/grass-water-comparison/triage.json
+/working-patches/06-history/grass-water-comparison/UserConfigSelections.before
+/working-patches/06-history/grass-water-comparison/UserConfigSelections.staged
+
+# Disabled backup file
+/working-patches/05-game-support/TargetHardwareProfiler.dll.bak
+
+# Historical experiments, unconfirmed comparison, and superseded shim backups
+/working-patches/06-history/do-not-run/
+/working-patches/06-history/grass-water-comparison/
+/working-patches/06-history/shim-revisions/
+
+# Evidence and diagnostic records

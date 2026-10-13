@@ -1,0 +1,50 @@
+{
+  "utc": "2026-10-12T10:22:29.510500+00:00",
+  "scope": "Restore the setup before the crash investigation; preserve existing kernelbase and stretching fixes",
+  "checks": {
+    "engine_kernelbase": {
+      "path": "/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/lib/wine/x86_64-windows/kernelbase.dll",
+      "sha256": "313a9d07019422fe0f56a579667d005d756728e13b66329aaa15321d92b0f182",
+      "matches_pretest": true
+    },
+    "bottle_kernelbase": {
+      "path": "${HOME}/Library/Application Support/CrossOver/Bottles/Steam/drive_c/windows/system32/kernelbase.dll",
+      "sha256": "313a9d07019422fe0f56a579667d005d756728e13b66329aaa15321d92b0f182",
+      "matches_pretest": true
+    },
+    "stretching_shim": {
+      "path": "${HOME}/Library/Application Support/CrossOver/Bottles/Steam/drive_c/windows/system32/d3d12.dll",
+      "sha256": "6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816",
+      "matches_baseline": true
+    },
+    "graphics_provider": {
+      "path": "${HOME}/Library/Application Support/CrossOver/Bottles/Steam/drive_c/windows/system32/apd12.dll",
+      "sha256": "f1bcaa4d79e4353e075e7f284ebcb2d44a1b0cb2aa88f01f6341dc3c518b976f",
+      "matches_baseline": true
+    },
+    "temporary_game_folder_d3d12_removed": true,
+    "game_exe_matches_recorded_baseline": true,
+    "crash_handlers": [
+      {
+        "key": "Software\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\AeDebug",
+        "default_handler": true,
+        "auto_1": true
+      },
+      {
+        "key": "Software\\\\Wow6432Node\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\AeDebug",
+        "default_handler": true,
+        "auto_1": true
+      }
+    ],
+    "normal_launcher_helper": {
+      "sha256": "bed23023e0af7e61b2a781728541dc2517ba8a888359aa5a1ee2158546a2d1ba",
+      "matches_original": true
+    },
+    "normal_launcher_plist": {
+      "sha256": "e95248fa515a3671cd4d0d3450a02de06375bd4f2323095a2355872a871ecf5f",
+      "matches_original": true
+    }
+  },
+  "recorders_disabled": true,
+  "diagnostic_artifacts": "Logs, backups and diagnostic source retained in diagnostics; none configured as an active crash handler."
+}

@@ -1,0 +1,1 @@
+# Full scene baseline. No shader draws suppressed.

@@ -1,0 +1,322 @@
+;;----------------------------------------------------------------------
+;;
+;;  CrossOver Bottle Configuration File
+;;
+;;----------------------------------------------------------------------
+;;-----< [Bottle] Section >---------------------------------------------
+;;    This section contains the general bottle settings.
+;;----------------------------------------------------------------------
+[Bottle]
+;;-----------------< Basic Settings >-----------------------------------
+;;
+;; MenuRoot             Specifies where Wine should create the menu
+;;                      entries for Windows applications, i.e. where
+;;                      the root of the "Start Menu" should be.
+;;
+;;                      Default:    ""
+;;
+;; MenuStrip            Specifies that the first N Windows menu levels
+;;                      should be stripped. So if MenuStrip is set to
+;;                      one, then a menu that would be in the 'Programs'
+;;                      menu folder on Windows, would appear in the menu
+;;                      root in your desktop environment.
+;;
+;;                      Default:    0
+;;
+;;----------------------------------------------------------------------
+"MenuRoot" = "/Windows Applications"
+"MenuStrip" = "1"
+;;-----------------< Advanced Settings > -------------------------------
+;;
+;; BottleID             This is a unique id for this bottle. It can be
+;;                      used to tag items as belonging to this bottle
+;;                      and to avoid name conflicts.
+;;
+;;                      Default:    ""
+;;
+;; Version              This is the CrossOver version that this bottle
+;;                      was created or last upgraded to.
+;;
+;;                      Default:    ""
+;;
+;; Timestamp            This is the CrossOver build timestamp that this
+;;                      bottle was created or last upgraded to.
+;;
+;;                      Default:    ""
+;;
+;; Encoding             This is the system character encoding that was
+;;                      used when creating this bottle. In particular
+;;                      this impacts the filenames created by
+;;                      applications which may limit the portability of
+;;                      this bottle to systems using a different
+;;                      encoding.
+;;
+;;                      Default:    ""
+;;
+;; Description          A string describing the contents of the bottle.
+;;
+;;                      Default:    ""
+;;
+;; Template             The template this bottle is based on.
+;;
+;;                      Default:    ""
+;;
+;; WindowsVersion       The Windows version this bottle is based on.
+;;
+;;                      Default:    ""
+;;
+;; Updater              Specifies the path to an executable to be run
+;;                      to update or create the bottle from a central
+;;                      shared location.
+;;                      This option is typically used in multi-user
+;;                      setups to create the bottle directory for
+;;                      new users. If empty, then nothing is done.
+;;                      This setting can use environment variables with
+;;                      the syntax '${VARNAME}'.
+;;
+;;                      Default:    ""
+;;
+;; ManagedLinkType      A comma-separated list specifying the type of
+;;                      link to be created for the 'Link' policy.
+;;                      'Symbolic' will cause the creation of a
+;;                      symbolic link while 'Hard' will cause the
+;;                      creation of a hard link. If both are
+;;                      specified then they are tried in turn until
+;;                      one succeeds. Thus order is important.
+;;
+;;                      Default:    "Symbolic"
+;;
+;; MenuMode             If set to 'install' then the menus will
+;;                      be automatically reinstalled when needed.
+;;
+;;                      Default:    "ignore"
+;;
+;; AssocMode            If set to 'install' then the associations will
+;;                      be automatically reinstalled when needed.
+;;
+;;                      Default:    "ignore"
+;;
+;; AllowUntrusted       Don't warn about untrusted applications and
+;;                      documents.
+;;
+;;                      Default:    0
+;;
+;;----------------------------------------------------------------------
+"BottleID" = "5835CBAC-ECEF-496F-ADB2-26300706712F"
+"Version" = "26.3.0.39832"
+"Timestamp" = "20260715T103801Z"
+"Encoding" = "UTF-8"
+;;"Description" = ""
+"Template" = "win10_64"
+;;"WindowsVersion" = ""
+;;"Updater" = ""
+;;"ManagedLinkType" = ""
+"MenuMode" = "install"
+"AssocMode" = "install"
+;;"AllowUntrusted" = ""
+;;-----< [ManagedUpdatePolicy] Section >--------------------------------
+;;    This section defines the update policy for managed mode,
+;;    that is how files and directories are made available to the
+;;    per-user bottle stubs. The settings let you specify whether they
+;;    should be linked (and thus read-only), or copied (and thus
+;;    writable), ignored, etc.
+;;----------------------------------------------------------------------
+"WineArch" = "win64"
+"RatingHookDate" = "1792181218"
+[ManagedUpdatePolicy]
+;;-----------------< Update Policy Definition >-------------------------
+;;
+;; This is a set of key/value pairs.
+;;
+;; Each key is a regular expression which matches one or more files in
+;; the current bottle. All regular expressions are case insensitive.
+;; Using '^' and '$' to anchor the regular expression at the start and
+;; end of the file or directory name is recommended.
+;;
+;; Some regular expression examples:
+;;  * ^drive_c/Windows/System
+;;    Matches all files and directories in 'c:\Windows\System' but also
+;;    'c:\Windows\System32' or any other file or directory located in
+;;    'c:\Windows' with a name starting with 'System'.
+;;
+;;  * ^drive_c/Windows/System/
+;;    Matches all files and directories in 'c:\Windows\System'.
+;;
+;;  * ^drive_c/Windows/System$
+;;    Matches the 'c:\Windows\System' directory but not files or
+;;    directories contained therein.
+;;
+;;  * ^drive_c/Windows/(system|win)\.ini$
+;;    Matches 'c:\Windows\System.ini' and 'c:\Windows\win.ini'.
+;;
+;;  * \.scr$
+;;    Matches all files and directories with a '.scr' extension.
+;;
+;;
+;; The value associated with each regular expression specifies how to
+;; make corresponding the files and directories accessible to the user,
+;; and how to deal with modifications.
+;;
+;; Delete               Delete the file or directory from the user's
+;;                      stub bottle. Note that this policy has the
+;;                      potential of deleting whole directory
+;;                      hierarchies and should thus be used with
+;;                      caution.
+;;                      ** Use with caution **
+;;
+;; Ignore               Ignore the file or directory.
+;;                      Matched files and directories will not be copied
+;;                      to the user's bottle stub, and will be ignored
+;;                      if they are found in there.
+;;                      Note that since directories are skipped
+;;                      entirely, this policy causes their contents to
+;;                      be ignored too.
+;;
+;; Link                 Link the user's file to the managed bottle's
+;;                      file. Directories are copied.
+;;                      This policy is space efficient but makes the
+;;                      file read-only. Because of this it should not
+;;                      be used for files containing user settings.
+;;                      Note that directories are still copied, it is
+;;                      only the files they contain that are created as
+;;                      links. This is so that the user can add new
+;;                      files to these directories.
+;;                      ** This is the default policy **
+;;
+;; LinkDir              Link the user's file or directory to the managed
+;;                      bottle's file or directory.
+;;                      This is very space efficient, especially for
+;;                      directories where it also saves on inode usage.
+;;                      However it makes the whole directory read-only,
+;;                      thus preventing the user from adding / removing
+;;                      any file to / from it.
+;;                      ** Use with caution **
+;;
+;; Copy                 Copies the file to the user's stub bottle
+;;                      This increases disk usage but makes the files
+;;                      modifiable by the user and is thus required
+;;                      when they contain user settings.
+;;                      If the managed bottle's file is then modified,
+;;                      the user's file will not be updated unless the
+;;                      'ReplaceFiles' option is used (see below).
+;;
+;; Registry             Marks the file as a registry file.
+;;                      Registry files are copied to the user's stub
+;;                      bottle but allow changes in the managed bottle's
+;;                      registry to be merged at the individual key /
+;;                      value level.
+;;                      Unless the 'ReplaceFiles' option is used, only
+;;                      new keys and values are merged to the user's
+;;                      registry. This preserves the user's settings
+;;                      for that registry file.
+;;                      If you wish to overwrite the registry file
+;;                      wholesale, use the 'Copy' policy.
+;;                      ** To be used only on registry files **
+;;
+;; For the 'Link', 'LinkDir', 'Copy' and 'Registry' policies,
+;; one can specify extra options specifying what to do if the user
+;; file no longer matches the managed bottle's file. To do so specify
+;; one of the following after a comma:
+;;
+;; ReplaceFiles         This option applies to files only.
+;;                      It specifies that the content of the managed
+;;                      bottle's file should replace the content of the
+;;                      user's file whenever managed bottle's file is
+;;                      modified.
+;;                      For the 'Registry' policy, this applies at the
+;;                      individual registry key / value level so that
+;;                      the managed bottle's keys / values are added or
+;;                      replace the user's key / values. However any
+;;                      extra key / value created by the user is
+;;                      preserved.
+;;                      Finally this specifies that if a file violates
+;;                      policy (for instance it was copied but the
+;;                      current policy specifies it should be a link),
+;;                      then remedial action will be taken.
+;;
+;; ReplaceDirs          Directories violating policy will be replaced.
+;;                      For instance if the policy dictates linking to
+;;                      the managed bottle's directory but a copy is
+;;                      found instead, then the directory will be
+;;                      deleted and replaced with a link.
+;;                      Note that this option has the potential of
+;;                      deleting whole directory trees and should thus
+;;                      be used with caution.
+;;
+;; ReplaceConflicting   If set, then files that should be directories or
+;;                      vice versa will be replaced.
+;;
+;; Finally, note that if more than one regular expression matches a
+;; given file name, then the first one is used.
+;; Thus the order of the rules below is important.
+;;
+;;----------------------------------------------------------------------
+;; Wine rules
+"^\.wineserver$"      = "Delete"
+"^desktopdata(?:/|$)" = "LinkDir"
+"^windata(?:/|$)"     = "LinkDir"
+"^cxbottle.conf$"     = "Link,ReplaceFiles"
+;; Registry rules
+"^system.reg$"   = "Registry,ReplaceFiles,ReplaceConflicting"
+"^userdef.reg$"  = "Registry,ReplaceConflicting"
+"^user.reg$"     = "Registry,ReplaceConflicting"
+;; Microsoft Office files
+"^drive_c/users/Public/Application Data/Microsoft Help/" = "Copy"
+"^drive_c/Windows/(?:control\.ini|hh\.dat|mapiuid\.ini|Reg Save Log\.txt)$" = "Copy"
+;; Notes files
+"Lotus/Notes/(Data/|notes.ini)" = "Copy"
+;; Outlook + 'Internet Only' email
+"^drive_c/Program Files/Common Files/System/Mapi/1033/95/(CMC.DLL|CONTAB32.DLL|DUMPSTER.DLL|EMSABP32.DLL|EMSMDB32.DLL|EMSUI32.DLL|ESCONF.DLL|EXCHNG.HLP|INETAB32.DLL|MAPISP32.EXE|MINET32.DLL|MSMAPI32.DLL|MSPST32.DLL|SCRPTXTN.DLL)$" = "Copy"
+"^drive_c/Program Files/Microsoft Office/Office/1033/(OLXCHNG9.AW|OLXCHNG9.CHM)$" = "Copy"
+;; Outlook + 'Corporate or Workgroup' email
+"^drive_c/Program Files/Common Files/System/Mapi/1033/95/(OMI9.DLL|OMIPST9.DLL|PSTPRX32.DLL)$" = "Copy"
+"^drive_c/Program Files/Microsoft Office/Office/1033/(OMI9.AW|OMI9.CHM)$" = "Copy"
+;; Quicken files
+"(?:/QUICKEN\.INI|/intuprof\.ini|/QW\.(?:CFG|RMD))$" = "Copy"
+;; QuickTime files
+"\.(qtp|qtr)$" = "Copy"
+;; Remedy files
+"^drive_c/Program Files/AR System/HOME/" = "Copy"
+;; Trillian files
+"Trillian/(?:trillian\.ini|skins/|users/)" = "Copy"
+;; Accelerated Reader
+"^drive_c/AccReadr/Reports" = "Copy"
+;; Spooling for PPD files
+"^drive_c/windows/system32/spool/" = "Copy"
+;; Windows files
+"^drive_c/(?:Temp|Windows/(?:Cookies|History|Recent|Temp|Temporary Internet Files))/" = "Ignore"
+"^drive_c/users/[^/]+/(?:Cookies|Local Settings/(?:History|Temporary Internet Files)|Recent)/" = "Ignore"
+"^drive_c/users/crossover/" = "Copy"
+"^drive_c/Windows/win\.ini$" = "Copy"
+;; To modify the default policy edit and uncomment the line below.
+;; Make sure this line is always last otherwise it will override all the
+;; rules that follow.
+;; ".*" = "Link"
+;;---------------< User defined environment variables >-----------------
+;; Add environment variables that need to be defined in the
+;; Wine environment here. They should be in the form:
+;;
+;; "VARIABLE" = "value"
+;;
+;;----------------------------------------------------------------------
+[EnvironmentVariables]
+;;"PROMPT" = "$p$g"
+"CX_BOTTLE_CREATOR_APPID" = "com.codeweavers.c4.206"
+"WINEMSYNC" = "1"
+"D3DM_MTL4" = "0"
+"DXMT_ENABLE_NVEXT" = "1"
+"D3DM_VENDOR_ID"="0x8086"
+"D3DM_DEVICE_ID"="0x56a1"
+"D3DM_DEVICE_DESCRIPTION"="Intel(R) Arc(TM) A750 Graphics"
+"DXMT_ENABLE_NVEXT" = "0"
+"CX_GRAPHICS_BACKEND"="d3dmetal"
+"HB_D3D12_REAL" = "apd12.dll"
+"HB_TSSHIM_DEBUG" = "1"
+"D3DM_ENABLE_METALFX" = "0"
+"HB_TSSHIM_TRACE_INDIRECT_PSO" = "1"
+"HB_TSSHIM_DRAW_CENSUS" = "1"
+"HB_TSSHIM_CAPTURE_INDIRECT_ARGS" = "0"
+"HB_TSSHIM_HOT_SKIP" = "1"
+"HB_TSSHIM_SKIP_ALL_INSTANCED" = "0"
+"HB_TSSHIM_CAPTURE_BINDINGS" = "0"
+"HB_TSSHIM_EXPLICIT_INPUT_OFFSETS" = "1"

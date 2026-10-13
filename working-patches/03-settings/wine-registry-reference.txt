@@ -1,0 +1,85 @@
+Reference only. This is an excerpt of Wine user.reg, not an importable .reg file.
+
+[Software\\Wine\\AppDefaults\\cxwget.exe\\DllOverrides] 1791576122
+#time=1dd58290d046902
+"wininet"="builtin"
+
+
+[Software\\Wine\\AppDefaults\\winewrapper.exe\\DllOverrides] 1791576122
+#time=1dd58290d046f88
+"crypt32"="builtin"
+"rsabase"="builtin"
+"rsaenh"="builtin"
+
+
+[Software\\Wine\\DllOverrides] 1791738880
+#time=1dd59a3fffe82d4
+"*autorun.exe"="native,builtin"
+"*ctfmon.exe"="builtin"
+"*ddhelp.exe"="builtin"
+"*docbox.api"=""
+"*findfast.exe"="builtin"
+"*ieinfo5.ocx"="builtin"
+"*maildoff.exe"="builtin"
+"*mdm.exe"="builtin"
+"*mosearch.exe"="builtin"
+"*msiexec.exe"="builtin"
+"*pstores.exe"="builtin"
+"*user.exe"="native,builtin"
+"amstream"="native, builtin"
+"atl"="native, builtin"
+"crypt32"="native, builtin"
+"d3dxof"="native, builtin"
+"dciman32"="native"
+"devenum"="native, builtin"
+"dnet"="native"
+"dplay"="native, builtin"
+"dplaysvr.exe"="native, builtin"
+"dplayx"="native, builtin"
+"dpnaddr"="native, builtin"
+"dpnet"="native, builtin"
+"dpnhpast"="native, builtin"
+"dpnhupnp"="native, builtin"
+"dpnlobby"="native, builtin"
+"dpnsvr.exe"="native, builtin"
+"dpnwsock"="native, builtin"
+"dxdiagn"="native, builtin"
+"hhctrl.ocx"="native, builtin"
+"hlink"="native, builtin"
+"iernonce"="native, builtin"
+"itss"="native, builtin"
+"jscript"="native, builtin"
+"mlang"="native, builtin"
+"mshtml"="native, builtin"
+"msi"="builtin"
+"msvcirt"="native, builtin"
+"msvcrt40"="native, builtin"
+"msvcrtd"="native, builtin"
+"odbc32"="native, builtin"
+"odbccp32"="native, builtin"
+"ole32"="builtin"
+"oleaut32"="builtin"
+"olepro32"="builtin"
+"onlinefix64"="native"
+"quartz"="native, builtin"
+"riched20"="native, builtin"
+"riched32"="native, builtin"
+"rpcrt4"="builtin"
+"rsabase"="native, builtin"
+"secur32"="native, builtin"
+"shdoclc"="native, builtin"
+"shdocvw"="native, builtin"
+"softpub"="native, builtin"
+"steam_api64"="native"
+"steamoverlay64"="native"
+"urlmon"="native, builtin"
+"wininet"="builtin"
+"winmm"="native,builtin"
+"wintrust"="native, builtin"
+"wscript.exe"="native, builtin"
+
+
+[Software\\Wine\\Mac Driver] 1791617416
+#time=1dd588931e3ae44
+"AllowSetGamma"=dword:00000000
+"RetinaMode"="y"

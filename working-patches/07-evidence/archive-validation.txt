@@ -1,0 +1,16 @@
+Historical capture validation from the pre-cleanup local archive. Its PASS lines refer to that earlier full working copy, including artifacts later omitted from Git. For the current Git-delivered package, run tools/verify_archive.py.
+
+PASS syntax: copy_checked.py
+PASS syntax: verify_archive.py
+PASS kernelbase delta reconstructs the installed binary exactly
+PASS all local shim header dependencies present
+PASS v5 and previous-v4 Wine markers and mandatory ordinal exports
+PASS engine/bottle kernelbase, shim and provider copies agree
+PASS dry run leaves target and backup inventory untouched
+PASS unknown target hash refuses without modification
+PASS write requires game-closed acknowledgment
+PASS explicit copy installs exact bytes and preserves verified backup
+PASS already-installed state is idempotent
+PASS external backup rollback restores the exact original bytes
+PASS symlink target refused without changing its referent
+No live game/bottle/application targets were written or executed during verification.
