@@ -67,10 +67,20 @@ static HMODULE load_real(void)
     DWORD n;
     if (real_dll) return real_dll;
     n = GetEnvironmentVariableW(L"HB_D3D12_REAL", path, 1024);
+    LOG("load_real: GetEnvironmentVariableW(HB_D3D12_REAL) n=%lu, path='%ls'", n, (n && n < 1024) ? path : L"(empty)");
     if (n && n < 1024) real_dll = LoadLibraryW(path);
     else real_dll = LoadLibraryW(L"d3d12_d3dmetal.dll");
-    if (real_dll == self) { fprintf(stderr, "tsshim: the real d3d12.dll resolved to the shim itself\n"); real_dll = NULL; }
-    if (!real_dll) fprintf(stderr, "tsshim: cannot load the real D3DMetal d3d12.dll (%ls, error %lu)\n", n ? path : L"d3d12_d3dmetal.dll", GetLastError());
+    LOG("load_real: LoadLibraryW returned %p (self=%p)", real_dll, self);
+    if (real_dll == self) {
+        LOG("tsshim: the real d3d12.dll resolved to the shim itself (self=%p)", self);
+        real_dll = NULL;
+    }
+    if (!real_dll) {
+        DWORD err = GetLastError();
+        LOG("tsshim: cannot load the real D3DMetal d3d12.dll (%ls, error %lu)", n ? path : L"d3d12_d3dmetal.dll", err);
+    } else {
+        LOG("load_real: successfully loaded real d3d12 provider %p", real_dll);
+    }
     return real_dll;
 }
 
@@ -2800,31 +2810,282 @@ HRESULT WINAPI D3D12CreateDevice(IUnknown *adapter, D3D_FEATURE_LEVEL level, REF
     return hr;
 }
 
+// ---- Safe memory helper --------------------------------------------------------------------
+static BOOL safe_read_mem(const void *addr, void *dst, SIZE_T sz)
+{
+    SIZE_T read = 0;
+    return ReadProcessMemory(GetCurrentProcess(), addr, dst, sz, &read) && (read == sz);
+}
+
+// ---- Dummy Object Infrastructure for C++ Member Function Bypasses -------------------------
+// When an activation function returning an object or bool is bypassed, returning NULL (0)
+// can lead to immediate null-pointer dereferences in the caller (e.g. at the return address).
+// We provide a static dummy object populated with valid vtable pointers and self-referential
+// members so that any member read, write, or virtual call executes cleanly without faulting.
+static void *g_dummy_vtable[512] = {0};
+static BYTE g_dummy_object_buf[8192] = {0};
+static void *g_dummy_instance = NULL;
+static int g_dummy_ready = 0;
+
+static DWORD64 WINAPI dummy_method(void)
+{
+    return (DWORD64)g_dummy_instance;
+}
+
+static void init_dummy_instance(void)
+{
+    if (g_dummy_ready) return;
+    for (int i = 0; i < 512; i++) {
+        g_dummy_vtable[i] = (void*)dummy_method;
+    }
+    // Align instance to 64 bytes, ensuring lower byte AL != 0 (e.g. ends in 0x40)
+    // so that boolean checks (test al, al) evaluate to TRUE / SUCCESS.
+    uintptr_t base_addr = (uintptr_t)g_dummy_object_buf;
+    uintptr_t aligned = (base_addr + 63) & ~(uintptr_t)63;
+    if ((aligned & 0xFF) == 0) {
+        aligned += 64;
+    }
+    g_dummy_instance = (void*)aligned;
+
+    void **slots = (void**)g_dummy_instance;
+    slots[0] = g_dummy_vtable; // vtable pointer at offset 0
+    for (int i = 1; i < 512; i++) {
+        slots[i] = g_dummy_instance; // self-referential member pointers
+    }
+    g_dummy_ready = 1;
+}
+
+static DWORD64 g_last_bypassed_caller = 0;
+
+// ---- Code & Stack Validation Helpers -------------------------------------------------------
+static BOOL is_valid_code_address(DWORD64 addr, DWORD64 base)
+{
+    if (addr == 0) return FALSE;
+    // Check ForzaHorizon4.exe primary and secondary .text sections
+    if (addr >= base + 0x1000 && addr < base + 0x4BB8200) return TRUE;
+    if (addr >= base + 0x8823000 && addr < base + 0x9B10E00) return TRUE;
+
+    // Check with VirtualQuery for any valid executable module memory
+    MEMORY_BASIC_INFORMATION mbi;
+    if (VirtualQuery((void*)addr, &mbi, sizeof(mbi)) == sizeof(mbi)) {
+        if (mbi.State == MEM_COMMIT &&
+            (mbi.Protect & (PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY))) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+static BOOL is_preceded_by_call(DWORD64 ret_addr)
+{
+    BYTE prec[8] = {0};
+    if (!safe_read_mem((void*)(ret_addr - 8), prec, 8)) return FALSE;
+
+    // Direct call rel32: E8 xx xx xx xx (5 bytes before ret_addr) -> prec[3] == 0xE8
+    if (prec[3] == 0xE8) return TRUE;
+
+    // Indirect call: FF 15 xx xx xx xx (6 bytes before ret_addr) -> prec[2] == 0xFF
+    if (prec[2] == 0xFF && (prec[3] & 0x38) == 0x10) return TRUE;
+
+    // Register call: FF D0-D7 (2 bytes before ret_addr) -> prec[6] == 0xFF && (prec[7] & 0xF8) == 0xD0
+    if (prec[6] == 0xFF && (prec[7] & 0xF8) == 0xD0) return TRUE;
+
+    // REX register call: 41 FF D0-D7 (3 bytes before ret_addr)
+    if (prec[5] == 0x41 && prec[6] == 0xFF && (prec[7] & 0xF8) == 0xD0) return TRUE;
+
+    // ModR/M register call with disp8: FF 50-57 xx (3 bytes before ret_addr)
+    if (prec[5] == 0xFF && (prec[6] & 0x38) == 0x10) return TRUE;
+
+    // ModR/M register call with disp32: FF 90-97 xx xx xx xx (6 bytes before ret_addr)
+    if (prec[2] == 0xFF && (prec[3] & 0x38) == 0x10) return TRUE;
+
+    return FALSE;
+}
+
 static PVOID g_veh_world_entry_fix = NULL;
 static LONG WINAPI fh4_world_crash_filter(PEXCEPTION_POINTERS ep)
 {
     if (ep && ep->ExceptionRecord && ep->ContextRecord) {
-        if (ep->ExceptionRecord->ExceptionCode == 0xC000001D /* STATUS_ILLEGAL_INSTRUCTION */) {
-            DWORD64 fault_ip = (DWORD64)ep->ExceptionRecord->ExceptionAddress;
-            DWORD64 base = (DWORD64)GetModuleHandleA(NULL);
-            DWORD64 target_func = base + 0x00D05DA0;
-            
-            // Check if fault occurred at or within the function entry region [0xD05DA0, 0xD05DE0)
-            if (fault_ip >= target_func && fault_ip < target_func + 0x40) {
+        DWORD code = ep->ExceptionRecord->ExceptionCode;
+        DWORD64 fault_ip = (DWORD64)ep->ExceptionRecord->ExceptionAddress;
+        DWORD64 base = (DWORD64)GetModuleHandleA(NULL);
+        DWORD64 target_addr = (ep->ExceptionRecord->NumberParameters > 1) ? ep->ExceptionRecord->ExceptionInformation[1] : 0;
+
+        init_dummy_instance();
+
+        if (code == 0xC000001D /* STATUS_ILLEGAL_INSTRUCTION */ ||
+            code == 0xC0000005 /* STATUS_ACCESS_VIOLATION */) {
+
+            // 1. Target Road Discovery Crash: 0x00D05DA0 (entry region [0xD05DA0, 0xD05DE0))
+            DWORD64 target_func_road = base + 0x00D05DA0;
+            if (fault_ip >= target_func_road && fault_ip < target_func_road + 0x40) {
                 DWORD64 *rsp_ptr = (DWORD64*)ep->ContextRecord->Rsp;
                 DWORD64 ret_ip = *rsp_ptr;
-                
-                LOG("FH4_WORLD_ENTRY_FIX: Intercepted illegal instruction at 0x%llx (RVA 0x%llx)! Bypassing to caller 0x%llx",
-                    fault_ip, fault_ip - base, ret_ip);
-                
-                // Advance RIP to caller return address and pop return address from stack:
+
+                LOG("FH4_WORLD_ENTRY_FIX: Intercepted fault 0x%08lx at 0x%llx (RVA 0x%llx) [Road Discovery]! Bypassing to caller 0x%llx",
+                    (unsigned long)code, fault_ip, fault_ip - base, ret_ip);
+
                 ep->ContextRecord->Rip = ret_ip;
                 ep->ContextRecord->Rsp += 8;
-                ep->ContextRecord->Rax = 0; // return status 0 (success / no error)
-                
+                ep->ContextRecord->Rax = 0; // return status 0 (success / no error for road discovery)
                 return EXCEPTION_CONTINUE_EXECUTION;
             }
+
+            // 2. Target Speed Zone / Milestone Crash: 0x00E18C60 - 0x00E19149 (specifically 0x00E18CDE)
+            DWORD64 target_func_sz = base + 0x00E18C60;
+            DWORD64 target_func_sz_end = base + 0x00E19149;
+            if (fault_ip >= target_func_sz && fault_ip < target_func_sz_end) {
+                BYTE *rsp_bytes = (BYTE*)ep->ContextRecord->Rsp;
+
+                // Log fault registers and opcodes at fault_ip
+                BYTE fault_code_bytes[16] = {0};
+                safe_read_mem((void*)fault_ip, fault_code_bytes, sizeof(fault_code_bytes));
+                LOG("FH4_WORLD_ENTRY_FIX: Speed zone fault 0x%08lx at 0x%llx (RVA 0x%llx) [bytes: %02x %02x %02x %02x %02x %02x %02x %02x] RAX=0x%llx RBX=0x%llx RCX=0x%llx RDX=0x%llx RSI=0x%llx RDI=0x%llx RBP=0x%llx RSP=0x%llx",
+                    (unsigned long)code, fault_ip, fault_ip - base,
+                    fault_code_bytes[0], fault_code_bytes[1], fault_code_bytes[2], fault_code_bytes[3],
+                    fault_code_bytes[4], fault_code_bytes[5], fault_code_bytes[6], fault_code_bytes[7],
+                    ep->ContextRecord->Rax, ep->ContextRecord->Rbx, ep->ContextRecord->Rcx, ep->ContextRecord->Rdx,
+                    ep->ContextRecord->Rsi, ep->ContextRecord->Rdi, ep->ContextRecord->Rbp, ep->ContextRecord->Rsp);
+
+                // Dump function entry bytes
+                BYTE func_head[16] = {0};
+                safe_read_mem((void*)target_func_sz, func_head, sizeof(func_head));
+                LOG("FH4_WORLD_ENTRY_FIX: Function 0x%llx head bytes: %02x %02x %02x %02x %02x %02x %02x %02x",
+                    target_func_sz,
+                    func_head[0], func_head[1], func_head[2], func_head[3],
+                    func_head[4], func_head[5], func_head[6], func_head[7]);
+
+                // Dump top 24 stack qwords for forensic analysis
+                for (int off = 0; off < 24 * 8; off += 8) {
+                    DWORD64 sval = 0;
+                    safe_read_mem((void*)(rsp_bytes + off), &sval, sizeof(sval));
+                    LOG("FH4_WORLD_ENTRY_FIX: Stack[+0x%03x] = 0x%llx%s",
+                        off, sval, (sval >= base + 0x1000 && sval < base + 0x4BB8200) ? " [.text!]" : "");
+                }
+
+                // Dynamic stack scan to find legitimate return address
+                DWORD64 real_ret_ip = 0;
+                int real_stack_offset = -1;
+
+                // Priority 1: Valid code address preceded by a CALL instruction
+                for (int off = 0; off <= 0x1000; off += 8) {
+                    DWORD64 cand = 0;
+                    if (!safe_read_mem((void*)(rsp_bytes + off), &cand, sizeof(cand))) break;
+
+                    if (is_valid_code_address(cand, base) && is_preceded_by_call(cand)) {
+                        LOG("FH4_WORLD_ENTRY_FIX: Found caller return address via call-site check at stack offset +0x%x: 0x%llx (RVA 0x%llx)",
+                            off, cand, cand - base);
+                        real_ret_ip = cand;
+                        real_stack_offset = off;
+                        break;
+                    }
+                }
+
+                // Priority 2: Fallback to any valid code address inside ForzaHorizon4.exe primary .text
+                if (real_ret_ip == 0) {
+                    for (int off = 0; off <= 0x1000; off += 8) {
+                        DWORD64 cand = 0;
+                        if (!safe_read_mem((void*)(rsp_bytes + off), &cand, sizeof(cand))) break;
+
+                        if (cand >= base + 0x1000 && cand < base + 0x4BB8200) {
+                            LOG("FH4_WORLD_ENTRY_FIX: Fallback code pointer found at stack offset +0x%x: 0x%llx (RVA 0x%llx)",
+                                off, cand, cand - base);
+                            real_ret_ip = cand;
+                            real_stack_offset = off;
+                            break;
+                        }
+                    }
+                }
+
+                if (real_ret_ip != 0) {
+                    DWORD64 caller_rsp = (DWORD64)(rsp_bytes + real_stack_offset + 8);
+
+                    // Restore preserved non-volatile registers relative to caller_rsp:
+                    // Standard frame size is 0xE8. If stack offset >= 0xE8, frame base is caller_rsp - 0xF0:
+                    BYTE *frame_base = (BYTE*)(caller_rsp - 0xF0);
+                    if ((DWORD64)frame_base >= (DWORD64)rsp_bytes) {
+                        ep->ContextRecord->Rbp = *(DWORD64*)(frame_base + 0xE0);
+                        ep->ContextRecord->R14 = *(DWORD64*)(frame_base + 0xD8);
+                        ep->ContextRecord->R15 = *(DWORD64*)(frame_base + 0xD0);
+                        ep->ContextRecord->Rbx = *(DWORD64*)(frame_base + 0xF0);
+                        ep->ContextRecord->Rsi = *(DWORD64*)(frame_base + 0xF8);
+                        ep->ContextRecord->Rdi = *(DWORD64*)(frame_base + 0x100);
+                        ep->ContextRecord->R12 = *(DWORD64*)(frame_base + 0x108);
+                    }
+
+                    LOG("FH4_WORLD_ENTRY_FIX: Successfully resolved frame! Bypassing to caller 0x%llx (RVA 0x%llx), caller RSP=0x%llx",
+                        real_ret_ip, real_ret_ip - base, caller_rsp);
+
+                    ep->ContextRecord->Rip = real_ret_ip;
+                    ep->ContextRecord->Rsp = caller_rsp;
+                    ep->ContextRecord->Rax = (DWORD64)g_dummy_instance;
+                    g_last_bypassed_caller = real_ret_ip;
+                    return EXCEPTION_CONTINUE_EXECUTION;
+                } else {
+                    LOG("FH4_WORLD_ENTRY_FIX: Warning - could not find valid code pointer on stack up to +0x1000!");
+                }
+            }
+
+            // 3. Target Caller / Dynamic Trampoline Fault (e.g. 0x242... or at ret_ip)
+            BOOL is_trampoline = FALSE;
+            if (g_last_bypassed_caller != 0 && (fault_ip >= g_last_bypassed_caller - 0x20 && fault_ip <= g_last_bypassed_caller + 0x200)) {
+                is_trampoline = TRUE;
+            } else if (fault_ip >= 0x200000000ULL && fault_ip <= 0x300000000ULL && (code == 0xC0000005 || code == 0xC000001D)) {
+                is_trampoline = TRUE;
+            }
+
+            if (is_trampoline) {
+                // Dynamically scan trampoline stack for valid code return address
+                DWORD64 outer_ret = 0;
+                int outer_off = -1;
+
+                for (int off = 0; off <= 0x400; off += 8) {
+                    DWORD64 cand = 0;
+                    if (!safe_read_mem((void*)(ep->ContextRecord->Rsp + off), &cand, sizeof(cand))) break;
+
+                    if (is_valid_code_address(cand, base) && is_preceded_by_call(cand)) {
+                        outer_ret = cand;
+                        outer_off = off;
+                        break;
+                    }
+                }
+
+                if (outer_ret == 0) {
+                    for (int off = 0; off <= 0x400; off += 8) {
+                        DWORD64 cand = 0;
+                        if (!safe_read_mem((void*)(ep->ContextRecord->Rsp + off), &cand, sizeof(cand))) break;
+
+                        if (cand >= base + 0x1000 && cand < base + 0x4BB8200) {
+                            outer_ret = cand;
+                            outer_off = off;
+                            break;
+                        }
+                    }
+                }
+
+                BYTE fault_bytes[16] = {0};
+                safe_read_mem((void*)fault_ip, fault_bytes, sizeof(fault_bytes));
+
+                LOG("FH4_WORLD_ENTRY_FIX: Intercepted dynamic trampoline fault 0x%08lx at 0x%llx (target=0x%llx) [bytes: %02x %02x %02x %02x]! RAX=0x%llx RCX=0x%llx RDX=0x%llx RBX=0x%llx RSP=0x%llx -> unwinding to valid outer caller 0x%llx (offset +0x%x)",
+                    (unsigned long)code, fault_ip, target_addr,
+                    fault_bytes[0], fault_bytes[1], fault_bytes[2], fault_bytes[3],
+                    ep->ContextRecord->Rax, ep->ContextRecord->Rcx, ep->ContextRecord->Rdx,
+                    ep->ContextRecord->Rbx, ep->ContextRecord->Rsp, outer_ret, outer_off);
+
+                if (outer_ret != 0) {
+                    ep->ContextRecord->Rip = outer_ret;
+                    ep->ContextRecord->Rsp = (DWORD64)(ep->ContextRecord->Rsp + outer_off + 8);
+                    ep->ContextRecord->Rax = (DWORD64)g_dummy_instance;
+                    return EXCEPTION_CONTINUE_EXECUTION;
+                }
+            }
         }
+
+        // Diagnostic log for any unexpected unhandled exceptions in the game
+        LOG("FH4_UNHANDLED_EXCEPTION: Code=0x%08lx at 0x%llx (RVA 0x%llx), target=0x%llx, RAX=0x%llx, RCX=0x%llx, RDX=0x%llx, RBX=0x%llx, RSP=0x%llx",
+            (unsigned long)code, fault_ip, fault_ip - base, target_addr,
+            ep->ContextRecord->Rax, ep->ContextRecord->Rcx, ep->ContextRecord->Rdx,
+            ep->ContextRecord->Rbx, ep->ContextRecord->Rsp);
     }
     return EXCEPTION_CONTINUE_SEARCH;
 }
@@ -2903,8 +3164,18 @@ BOOL WINAPI DllMain(HINSTANCE inst, DWORD reason, LPVOID reserved)
                 enable_veh = (v[0] != '0');
             }
             if (enable_veh) {
+                init_dummy_instance();
                 g_veh_world_entry_fix = AddVectoredExceptionHandler(1, fh4_world_crash_filter);
-                LOG("HB_TSSHIM_FIX_WORLD_ENTRY=1: Registered VEH for 0x140D05DA0 (handle=%p)", g_veh_world_entry_fix);
+                BYTE b_sz[8] = {0}, b_fault[8] = {0}, b_road[8] = {0};
+                DWORD64 b = (DWORD64)GetModuleHandleA(NULL);
+                safe_read_mem((void*)(b + 0x00E18C60), b_sz, 8);
+                safe_read_mem((void*)(b + 0x00E18CDE), b_fault, 8);
+                safe_read_mem((void*)(b + 0x00D05DA0), b_road, 8);
+                LOG("HB_TSSHIM_FIX_WORLD_ENTRY=1: Registered VEH (handle=%p, dummy=%p). Base=0x%llx, SZ_entry=[%02x %02x %02x %02x], SZ_body=[%02x %02x %02x %02x], Road=[%02x %02x %02x %02x]",
+                    g_veh_world_entry_fix, g_dummy_instance, b,
+                    b_sz[0], b_sz[1], b_sz[2], b_sz[3],
+                    b_fault[0], b_fault[1], b_fault[2], b_fault[3],
+                    b_road[0], b_road[1], b_road[2], b_road[3]);
             }
         }
         LOG("loaded in front of the real d3d12.dll");

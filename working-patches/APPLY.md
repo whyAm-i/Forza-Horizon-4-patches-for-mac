@@ -35,17 +35,18 @@ Read `01-launch-package/README.md` for the actual changed ranges and package ide
 
 ## 3. Restore the D3D12 proxy and matched provider
 
-The main shim is `02-rendering/bottle/d3d12.dll`. Use that one retained file for both the bottle and engine targets. SHA-256: `facc38fb8affbf579153bcc54de3b063fb99fd9be1513988f9e2eda1ee8ad1e6` (with VEH road-discovery bypass; pre-VEH v5 hash was `6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816`).
+The main shim is `02-rendering/bottle/d3d12.dll`. Use that one retained file for both the bottle and engine targets. SHA-256: `bc9d107e70aeb7e401b77303896b17d53c274fd92415b181f58ace378fb81a44` (with Speed Zone dynamic stack scan VEH bypass; road-discovery-only VEH hash was `facc38fb8affbf579153bcc54de3b063fb99fd9be1513988f9e2eda1ee8ad1e6`; pre-VEH v5 hash was `6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816`).
 
 Before installing the shim, confirm the CrossOver application already contains its stock `lib64/apple_gptk/external/libd3dshared.dylib` and D3DMetal framework. These proprietary runtime files are prerequisites and are not bundled. The retained `02-rendering/bottle/apd12.dll` hashes to `f1bcaa4d79e4353e075e7f284ebcb2d44a1b0cb2aa88f01f6341dc3c518b976f`; install it in both the engine and bottle. The engine's `wine/x86_64-unix/apd12.so` must be a relative symlink to `../../external/libd3dshared.dylib`.
 
 Known prior shim hashes:
+- Road-discovery-only VEH shim: `facc38fb8affbf579153bcc54de3b063fb99fd9be1513988f9e2eda1ee8ad1e6`
 - Pre-VEH v5 shim: `6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816`
 - Initial deployment backup: `f141fef749e1e18f16670ab439bf3294da8d7d78bc6e3833c07b6dd5e09995c7`
 
 ```sh
-python3 tools/copy_checked.py '02-rendering/bottle/d3d12.dll' "$BOTTLE/drive_c/windows/system32/d3d12.dll" --expected 6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816 --expected f141fef749e1e18f16670ab439bf3294da8d7d78bc6e3833c07b6dd5e09995c7
-python3 tools/copy_checked.py '02-rendering/bottle/d3d12.dll' "$CX/lib64/apple_gptk/wine/x86_64-windows/d3d12.dll" --expected 1b7a02cb37ec6b484e2aaa76b5ec9cbb47e63aeec29dbe087d5d1589a3347cfb --expected 6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816 --expected f141fef749e1e18f16670ab439bf3294da8d7d78bc6e3833c07b6dd5e09995c7
+python3 tools/copy_checked.py '02-rendering/bottle/d3d12.dll' "$BOTTLE/drive_c/windows/system32/d3d12.dll" --expected 52bdcd0abe16b7b99af4f127c7f04a0fde1195da5fa6c19cb9b4f12f371e6c5e --expected facc38fb8affbf579153bcc54de3b063fb99fd9be1513988f9e2eda1ee8ad1e6 --expected 6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816 --expected f141fef749e1e18f16670ab439bf3294da8d7d78bc6e3833c07b6dd5e09995c7
+python3 tools/copy_checked.py '02-rendering/bottle/d3d12.dll' "$CX/lib64/apple_gptk/wine/x86_64-windows/d3d12.dll" --expected 52bdcd0abe16b7b99af4f127c7f04a0fde1195da5fa6c19cb9b4f12f371e6c5e --expected facc38fb8affbf579153bcc54de3b063fb99fd9be1513988f9e2eda1ee8ad1e6 --expected 1b7a02cb37ec6b484e2aaa76b5ec9cbb47e63aeec29dbe087d5d1589a3347cfb --expected 6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816 --expected f141fef749e1e18f16670ab439bf3294da8d7d78bc6e3833c07b6dd5e09995c7
 ```
 
 Other prior shim revisions are captured in history. If installing onto a stock file with a different hash, verify that it belongs to the exact supported CrossOver build rather than bypassing the guard. Do not mix a new D3DMetal provider with this recovery snapshot. The game-folder root should not have an additional `d3d12.dll` overriding these targets.

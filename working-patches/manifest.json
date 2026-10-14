@@ -28,8 +28,8 @@
     },
     "02-rendering/bottle/d3d12.dll": {
       "type": "file",
-      "size": 281501,
-      "sha256": "facc38fb8affbf579153bcc54de3b063fb99fd9be1513988f9e2eda1ee8ad1e6",
+      "size": 289930,
+      "sha256": "bc9d107e70aeb7e401b77303896b17d53c274fd92415b181f58ace378fb81a44",
       "source": "${HOME}/Library/Application Support/CrossOver/Bottles/Steam/drive_c/windows/system32/d3d12.dll"
     },
     "02-rendering/source/binding_capture.h": {
@@ -40,8 +40,8 @@
     },
     "02-rendering/source/d3d12.c": {
       "type": "file",
-      "size": 142901,
-      "sha256": "769648db4fb5ef9b8e1f8ef08fd18fbdbeb2e47f3a242f55e7fa31985688ad90",
+      "size": 156604,
+      "sha256": "97a6a844cbf740c50e647e46a53c8f3089220ac28c29d019d5fc2670c395b655",
       "source": "${GAME_ROOT}/highball_repo/spike/tsshim/d3d12.c"
     },
     "02-rendering/source/d3d12.def": {

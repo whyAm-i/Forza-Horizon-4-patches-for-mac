@@ -1,5 +1,45 @@
 # Highball File Changes Log
 
+## Pipeline hooks cleanup & standalone d3d12.dll build — Antigravity (2026-10-14)
+
+- Removed stray diagnostic `#include "grass_shader.h"` and experimental grass guard hook wrappers (`grass_stream`, `grass_graphics`, `g_grass_guards`) inadvertently carried over from `diagnostics/grass-20261013`.
+- Restored `hook_CreatePipelineStateStream`, `hook_LoadGraphicsPipeline`, `hook_LoadPipeline`, and `hook_CreateGraphicsPipelineState` to clean production input-offsets-only handling.
+- Recompiled `d3d12.dll` cleanly with MinGW-w64, signed as Wine builtin PE, strictly preserving export ordinals 100 (`GetBehaviorValue`) and 101 (`D3D12CreateDevice`).
+- Deployed clean binary (SHA-256 `52bdcd0abe16b7b99af4f127c7f04a0fde1195da5fa6c19cb9b4f12f371e6c5e`) to `working-patches/02-rendering/source/d3d12.dll`, `working-patches/02-rendering/bottle/d3d12.dll`, CrossOver bottle `drive_c/windows/system32/d3d12.dll`, and CrossOver engine `lib64/apple_gptk/wine/x86_64-windows/d3d12.dll`.
+
+## Speed-zone activation dynamic stack scan frame recovery (Option 1) — Antigravity (2026-10-14)
+
+- Diagnosed stack frame shift under Option 1: in session 432 (`tsshim-432.log` at 00:10:49), the stack at hardcoded offset `+0xE8` held local variables/spill pointers (`0x2424f04ac` and `.data` pointer `0x147fe70d8`) because function `0x140E18C60` ran 75 bytes of internal logic after its prologue before faulting at `+0x7E`, shifting `RSP`.
+- Implemented an intelligent runtime stack scanner (`is_valid_code_address`, `is_preceded_by_call`) that inspects the thread stack dynamically up to `+0x1000` (4 KB).
+- Automatically identifies genuine caller return addresses in `ForzaHorizon4.exe`'s `.text` section preceded by valid x64 `call` instructions (`E8`, `FF 15`, `FF D0-D7`, `41 FF D0-D7`, `FF 50-57`), bypassing local stack spills and unmapped memory.
+- Calculates `caller_rsp` and restores non-volatile registers (`Rbp`, `R14`, `R15`, `Rbx`, `Rsi`, `Rdi`, `R12`) relative to the recovered frame.
+- Added stack dump logging (first 24 slots = 192 bytes) and function head disassembly dump.
+- Applied identical dynamic stack scanning to the secondary trampoline unwinder.
+- Recompiled `d3d12.dll` with MinGW-w64, signed as Wine builtin PE, preserving export ordinals 100 (`GetBehaviorValue`) and 101 (`D3D12CreateDevice`).
+- Deployed new binary (SHA-256 `b0bf899f5029d0058cd0ddac9cca37f24a4f88c8227339139408417106a329ca`) to bottle `system32/d3d12.dll`, CrossOver engine `lib64/apple_gptk/wine/x86_64-windows/d3d12.dll`, and repository archives.
+
+## Speed-zone activation dummy object & dynamic trampoline unwinding — Antigravity (2026-10-14)
+
+- Diagnosed secondary fault at `0x242791aed` after successful interception of primary fault at `0x140E18CDE` in session 2660 (`tsshim-2660.log`).
+- Cause: The dynamic dispatch caller at `0x242791aed` expected `0x140E18C60` to return a valid object pointer or non-zero status; setting `Rax = 0` caused a null-pointer dereference (`STATUS_ACCESS_VIOLATION` accessing `0x0`).
+- Implemented static dummy object infrastructure (`g_dummy_instance`, `g_dummy_vtable`) in `d3d12.c`. The dummy instance is 16-byte aligned with non-zero lower byte `AL` (satisfying boolean `true` checks) and a self-referential vtable returning `g_dummy_instance`, allowing any virtual method calls or member dereferences on the return value to succeed transparently.
+- Implemented dynamic trampoline / caller fault unwinding: intercepts secondary access violations or illegal instructions in the heap range (`0x200000000` - `0x300000000`) or within `ret_ip`, logging fault context and unwinding the trampoline frame to `outer_ret` (`*(DWORD64*)Rsp`).
+- Added safe memory reading (`safe_read_mem` via `ReadProcessMemory`) for fault code inspection, instruction logging, and startup memory dumping.
+- Added universal diagnostic exception logging (`FH4_UNHANDLED_EXCEPTION`) so any unhandled fault anywhere in the process is logged in detail.
+- Recompiled `d3d12.dll` with MinGW-w64, signed as Wine builtin PE, preserving exports (Ordinal 100 GetBehaviorValue, Ordinal 101 D3D12CreateDevice).
+- Deployed new binary (SHA-256 `edaefb241038ef93dfb3c6b8fbe00a22b4a978ace44ad3f41aac2667ff848a50`) to bottle `system32/d3d12.dll` and CrossOver engine `lib64/apple_gptk/wine/x86_64-windows/d3d12.dll`.
+
+## Speed-zone activation crash VEH bypass (Arxan resolution) — Antigravity (2026-10-13)
+
+- Extended Vectored Exception Handler (VEH) `fh4_world_crash_filter` in Direct3D 12 proxy shim `d3d12.c`.
+- Intercepts CPU `0xC0000005` (`STATUS_ACCESS_VIOLATION`) and `0xC000001D` (`STATUS_ILLEGAL_INSTRUCTION`) across the speed zone / PR stunt activation function `0x140E18C60` - `0x140E19149` (specifically at RVA `0x00E18CDE` / offset `0x7E`).
+- Resolves function standard frame (frame size 0xE8, prologue length 0x33), restores saved non-volatile registers (`Rbp`, `R14`, `R15`, `Rbx`, `Rsi`, `Rdi`, `R12`), reads caller return address from `rsp + 0xE8`, advances RIP, adjusts stack pointer (`Rsp = rsp + 0xF0`), and sets return status 0 (`Rax = 0`), simulating a clean return.
+- Preserves existing road-discovery interception at `0x140D05DA0`.
+- Verified in isolated Win64 unit test in Wine environment across road discovery, post-prologue speed zone body, and entry paths.
+- Recompiled `d3d12.dll` with MinGW-w64, signed as Wine builtin PE with `mark-builtin.py`, preserving ordinals 100 (`GetBehaviorValue`) and 101 (`D3D12CreateDevice`).
+- Deployed new binary (SHA-256 `0233bd99836e811698196bc43c69bb9c4dee74a5c6a0dd8fffbe18f69ca8d8a4`) to bottle `system32/d3d12.dll` and CrossOver engine `lib64/apple_gptk/wine/x86_64-windows/d3d12.dll`.
+- Preserved pre-change backup copies (`.bak_before_speedzone_fix`).
+
 ## World-entry road discovery crash VEH bypass — Antigravity (2026-10-13)
 
 - Implemented Vectored Exception Handler (VEH) `fh4_world_crash_filter` in `02-rendering/source/d3d12.c`.
