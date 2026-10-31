@@ -2794,6 +2794,11 @@ static void patch_device(ID3D12Device *dev)
     LOG("device %p patched (timestamp frequency %llu Hz)", (void *)dev, (unsigned long long)qpc_freq);
 }
 
+static void drift_arm_first_chance(void);
+static void drift_disarm_first_chance(void);
+static void drift_start_event_gate(void);
+static void drift_remove_event_gate(void);
+
 // ---- exports -------------------------------------------------------------------------------
 
 HRESULT WINAPI D3D12CreateDevice(IUnknown *adapter, D3D_FEATURE_LEVEL level, REFIID riid, void **out)
@@ -2803,6 +2808,10 @@ HRESULT WINAPI D3D12CreateDevice(IUnknown *adapter, D3D_FEATURE_LEVEL level, REF
     HRESULT hr;
     if (!fn) return E_FAIL;
     hr = fn(adapter, level, riid, out);
+    if (SUCCEEDED(hr) && out && *out) {
+        drift_arm_first_chance();
+        drift_start_event_gate();
+    }
     if (SUCCEEDED(hr) && out && *out && !idle) {
         ID3D12Device *dev = NULL; IUnknown *u = (IUnknown *)*out;
         if (SUCCEEDED(u->lpVtbl->QueryInterface(u, &IID_ID3D12Device, (void **)&dev)) && dev) { patch_device(dev); dev->lpVtbl->Release(dev); }
@@ -2902,6 +2911,9 @@ static BOOL is_preceded_by_call(DWORD64 ret_addr)
     return FALSE;
 }
 
+#include "drift_event_gate.h"
+#include "drift_capture.h"
+
 static PVOID g_veh_world_entry_fix = NULL;
 static LONG WINAPI fh4_world_crash_filter(PEXCEPTION_POINTERS ep)
 {
@@ -2911,6 +2923,7 @@ static LONG WINAPI fh4_world_crash_filter(PEXCEPTION_POINTERS ep)
         DWORD64 base = (DWORD64)GetModuleHandleA(NULL);
         DWORD64 target_addr = (ep->ExceptionRecord->NumberParameters > 1) ? ep->ExceptionRecord->ExceptionInformation[1] : 0;
 
+        drift_capture_exception(ep, base);
         init_dummy_instance();
 
         if (code == 0xC000001D /* STATUS_ILLEGAL_INSTRUCTION */ ||
@@ -3105,7 +3118,7 @@ BOOL WINAPI DllMain(HINSTANCE inst, DWORD reason, LPVOID reserved)
         { char v[8]; g_census_enabled = GetEnvironmentVariableA("HB_TSSHIM_DRAW_CENSUS", v, sizeof v) == 1 && v[0] == '1'; }
         { char v[8]; g_capture_bindings = GetEnvironmentVariableA("HB_TSSHIM_CAPTURE_BINDINGS", v, sizeof v) == 1 && v[0] == '1'; }
         { char v[8]; g_explicit_input_offsets = GetEnvironmentVariableA("HB_TSSHIM_EXPLICIT_INPUT_OFFSETS", v, sizeof v) == 1 && v[0] == '1'; }
-        LOG("SHIM_BUILD binding-capture-v5; bindings=%d; input_offsets=%d", g_capture_bindings, g_explicit_input_offsets);
+        LOG("SHIM_BUILD binding-capture-v5+drift-speedstyle-v3; bindings=%d; input_offsets=%d", g_capture_bindings, g_explicit_input_offsets);
         { char v[16]; if (GetEnvironmentVariableA("HB_TSSHIM_CENSUS_FRAME", v, sizeof v) > 0) { g_census_target_frame = (int)strtol(v, NULL, 0); g_census_enabled = 1; } }
         {
             char skip_buf[512] = {0};
@@ -3181,6 +3194,8 @@ BOOL WINAPI DllMain(HINSTANCE inst, DWORD reason, LPVOID reserved)
         LOG("loaded in front of the real d3d12.dll");
     }
     if (reason == DLL_PROCESS_DETACH) {
+        drift_remove_event_gate();
+        drift_disarm_first_chance();
         if (g_veh_world_entry_fix) {
             RemoveVectoredExceptionHandler(g_veh_world_entry_fix);
             g_veh_world_entry_fix = NULL;

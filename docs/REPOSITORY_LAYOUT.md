@@ -29,6 +29,7 @@ This page describes the files committed to Git. The archive manifest and checksu
     ├── 05-game-support/               # captured support files
     ├── 06-history/README.md           # history overview only
     ├── 07-evidence/                   # reports, notices, licenses, and provenance
+    ├── 08-drift-zone/                 # V3 install, backup/rollback, findings, diff, tests
     ├── APPLY.md
     ├── MANUAL_INSTALLATION.md
     ├── README.md
@@ -45,6 +46,7 @@ This page describes the files committed to Git. The archive manifest and checksu
 - `05-game-support` contains the captured support files. These are not independently established crash fixes.
 - `06-history` contains its overview only. Historical scripts and snapshots are excluded from Git and must not be applied.
 - `07-evidence` contains the checked-in investigation reports and notices. Runtime logs and other local diagnostic captures are excluded.
+- `08-drift-zone` contains drift fix and includes a reviewable baseline source diff and synthetic callback/ABI verification source. Its integrated source and exact working DLL are in `02-rendering`; generated builds, dumps, logs, saves and game code snapshots are excluded.
 - `manifest.json` and `SHA256SUMS` cover the tracked package files. `tools/verify_archive.py` verifies this Git-delivered set; ignored local files do not affect the result.
 
 The installed CrossOver 26.3 Apple GPTK runtime remains a prerequisite and is not bundled here. See [the provenance audit](CROSSOVER_PROVENANCE_AUDIT.md) for the dependency rationale.

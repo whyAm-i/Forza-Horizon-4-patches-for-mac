@@ -1,0 +1,2 @@
+# Unified-diff artifacts contain significant single-space context lines.
+working-patches/08-drift-zone/drift-zone-v3.patch -whitespace

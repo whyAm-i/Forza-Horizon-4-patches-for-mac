@@ -1,0 +1,87 @@
+.text
+.globl probe_gate_abi
+probe_gate_abi:
+    push %rbx
+    push %rbp
+    push %rsi
+    push %rdi
+    push %r12
+    push %r13
+    push %r14
+    push %r15
+    sub $0xb8,%rsp
+    mov %rcx,0x20(%rsp)
+    mov %rdx,0x28(%rsp)
+    mov %r8,0x30(%rsp)
+    mov %r9,0x38(%rsp)
+    mov 0x120(%rsp),%rax
+    mov %rax,0x40(%rsp)
+    mov %rsp,0x48(%rsp)
+    movdqu %xmm6,0x50(%rsp)
+    movdqu abi_pattern(%rip),%xmm6
+    movabs $0x1122334455667788,%rbx
+    movabs $0x2233445566778899,%rbp
+    movabs $0x33445566778899aa,%rsi
+    movabs $0x445566778899aabb,%rdi
+    movabs $0x5566778899aabbcc,%r12
+    movabs $0x66778899aabbccdd,%r13
+    movabs $0x778899aabbccddee,%r14
+    movabs $0x8899aabbccddeeff,%r15
+    mov 0x20(%rsp),%rax
+    mov 0x28(%rsp),%rcx
+    mov 0x30(%rsp),%rdx
+    mov 0x38(%rsp),%r8
+    mov 0x40(%rsp),%r9
+    call *%rax
+    mov $1,%r10d
+    cmp %rsp,0x48(%rsp)
+    jne abi_done
+    movabs $0x1122334455667788,%rax
+    cmp %rax,%rbx
+    jne abi_done
+    movabs $0x2233445566778899,%rax
+    cmp %rax,%rbp
+    jne abi_done
+    movabs $0x33445566778899aa,%rax
+    cmp %rax,%rsi
+    jne abi_done
+    movabs $0x445566778899aabb,%rax
+    cmp %rax,%rdi
+    jne abi_done
+    movabs $0x5566778899aabbcc,%rax
+    cmp %rax,%r12
+    jne abi_done
+    movabs $0x66778899aabbccdd,%rax
+    cmp %rax,%r13
+    jne abi_done
+    movabs $0x778899aabbccddee,%rax
+    cmp %rax,%r14
+    jne abi_done
+    movabs $0x8899aabbccddeeff,%rax
+    cmp %rax,%r15
+    jne abi_done
+    movdqu %xmm6,0x60(%rsp)
+    mov 0x60(%rsp),%rax
+    cmp abi_pattern(%rip),%rax
+    jne abi_done
+    mov 0x68(%rsp),%rax
+    cmp abi_pattern+8(%rip),%rax
+    jne abi_done
+    xor %r10d,%r10d
+abi_done:
+    mov %r10d,%eax
+    movdqu 0x50(%rsp),%xmm6
+    add $0xb8,%rsp
+    pop %r15
+    pop %r14
+    pop %r13
+    pop %r12
+    pop %rdi
+    pop %rsi
+    pop %rbp
+    pop %rbx
+    ret
+.section .rdata,"dr"
+.p2align 4
+abi_pattern:
+    .quad 0x0123456789abcdef,0xfedcba9876543210

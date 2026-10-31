@@ -7,8 +7,8 @@
 > ### 1. NEVER modify `ForzaHorizon4.exe` on disk
 > Arxan Anti-Tamper decrypts its `.text` section during execution. Any hex edit or binary patch to `ForzaHorizon4.exe` corrupts the encrypted layout, causing the executable to terminate immediately upon launch.
 
-> ### 2. NEVER perform in-memory code patching or detours on game code
-> Attempting to write `VirtualProtect` + hook bytes into the game's executable memory pages trips Arxan's periodic runtime integrity CRC checks, resulting in a crash shortly thereafter. The Vectored Exception Handler (VEH) in our proxy shim works precisely because it modifies **zero** bytes of memory.
+> ### 2. Avoid arbitrary in-memory code patches; preserve the drift fix's exact guards
+> Earlier in-memory hook/detour attempts were unsafe. The road/speed-zone VEH handlers do not rewrite game instructions. The later [drift-zone V3 fix](../working-patches/08-drift-zone/README.md) is a narrowly recorded exception: on the exact tested executable, it verifies the complete runtime signature, changes one entry byte at RVA `0x895250` from `0x5C` to `0xC3`, and observes a vtable while forwarding every callback.
 
 > ### 3. DO NOT strip Geometry or Tessellation Shaders
 > Older community workarounds suggested stripping geometry/tessellation stages (`no_gs=1`) to resolve crashes. In Forza Horizon 4, this causes missing terrain, missing road surfaces, or device-removal errors.

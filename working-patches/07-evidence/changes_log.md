@@ -583,3 +583,16 @@ The Code Cave has been rewritten with the mathematically perfect 56-character st
   - Verified with PE export parser (ordinal 101 matches `D3D12CreateDevice`, ordinal 100 matches `GetBehaviorValue`).
   - Binary SHA256: `f141fef749e1e18f16670ab439bf3294da8d7d78bc6e3833c07b6dd5e09995c7`.
   - Game NOT run.
+
+
+## Drift-zone V3 working patch (2026-10-31)
+
+- Current `02-rendering/bottle/d3d12.dll` and the existing `source/d3d12.dll` duplicate are the exact installed binary, SHA-256 `833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66`.
+- Integrated `source/d3d12.c`, `drift_event_gate.h` and `drift_capture.h`. Kept the existing road/speed-zone handler block unchanged.
+- Retained the guarded one-byte runtime entry return at game RVA `0x895250`. Preserved all ordinary drift callbacks; the wrapper observes and forwards rather than dropping notifications.
+- Preserved the V2.1 startup readiness fix: retry full signature matching every 250 ms for up to 300 seconds without mutation while code is unknown.
+- Recorded unsuccessful exception-unwind and callback-filter attempts in `08-drift-zone/FINDINGS.md`, including the wrong RDI restore and the stuck-zone regression. These earlier versions are not working archive choices.
+- Added shim-only install, verified backup/rollback, provider compatibility, portable synthetic ABI test, source diff and sanitized validation documentation in `08-drift-zone/`. No game EXE, dump, personal save, full code snapshot or proprietary GPTK runtime was added.
+- V3 local deployment preserved the prior V2.1 DLLs in `${GAME_ROOT}/drift-zone-work/backup-followup-20261031-114550/`; the original pre-drift road/speed-zone DLLs remain in `backup-20261030-193739/`. The V2.1 backup is failed-experiment history, not the recommended working rollback.
+- The successful graphics environment used CrossOver 26.3 / GPTK 4.0 beta 3 with provider SHA-256 `32c942ed368a45e58d35f4da3de3776d1f74e785731de9cf6a5e705a2925488a`. The older archived provider is unchanged and must not overwrite that matched runtime during a drift-only upgrade.
+- Refreshed the archive manifest/checksum inventory, including previously missing tracked speed-zone evidence/source copies and stale metadata from earlier commits. Packaging did not reinstall files into the working game.

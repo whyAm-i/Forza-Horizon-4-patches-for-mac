@@ -11,7 +11,7 @@ After deploying the patches, verify that the active files in your bottle match t
 ```bash
 # Check d3d12.dll
 shasum -a 256 "$BOTTLE/drive_c/windows/system32/d3d12.dll"
-# Expected: facc38fb8affbf579153bcc54de3b063fb99fd9be1513988f9e2eda1ee8ad1e6
+# Expected current V3: 833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66
 
 # Check kernelbase.dll
 shasum -a 256 "$BOTTLE/drive_c/windows/system32/kernelbase.dll"
@@ -19,6 +19,12 @@ shasum -a 256 "$BOTTLE/drive_c/windows/system32/kernelbase.dll"
 ```
 
 ---
+
+## Drift-zone V3 activation
+
+The bounded file `$BOTTLE/drive_c/highball/logs/drift-event-gate-<pid>.txt` must show `FH4_DRIFT_OBSERVER v3` and a successful installation result. A waiting message alone is not activation: the worker waits up to 300 seconds for exact runtime signatures. Drift completion/abort entries must say `forwarding`; older `skipped` records describe an unsuccessful intermediate version that left the zone active.
+
+Check both installed shim copies, then test recorded points, zone exit and subsequent zone entry. The owner reported the final V3 build working; Steam/Xbox achievement unlocks were not independently established. See [validation and portable tests](../working-patches/08-drift-zone/verification/README.md) and [the investigation](../working-patches/08-drift-zone/FINDINGS.md). The observer forwards every original callback and diagnostic capture leaves exception CONTEXT unchanged.
 
 ## 2. Verify Startup & VEH Interception Logs
 

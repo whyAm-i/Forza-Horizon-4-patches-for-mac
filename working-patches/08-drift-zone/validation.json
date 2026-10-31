@@ -1,0 +1,78 @@
+{
+  "patch": "FH4 drift observer V3",
+  "recorded_on": "2026-10-31",
+  "baseline_commit": "a5b6f5df77f657965722d899a73899a90b8484e0",
+  "game": {
+    "version": "1.478.564.0",
+    "architecture": "AMD64",
+    "exe_sha256": "b838a79a65c6d1e12f46deaba3584e4c88ebccdfdc4214b4535ece4ba3c0abbe",
+    "exe_file_modified": false,
+    "pe_timestamp": "0x655e0821",
+    "size_of_image": "0x9B10E00"
+  },
+  "tested_environment": {
+    "crossover": "26.3.0.39832",
+    "macos": "27",
+    "gptk": "4.0 beta 3",
+    "metal4": true,
+    "bottle_name": "New Bottle",
+    "active_apd12_sha256": "32c942ed368a45e58d35f4da3de3776d1f74e785731de9cf6a5e705a2925488a",
+    "archived_apd12_is_older_baseline": true
+  },
+  "runtime_changes": {
+    "reset_entry_rva": "0x895250",
+    "original_byte": "0x5C",
+    "replacement_byte": "0xC3",
+    "required_runtime_signature": "5c7d5539d97db90321331a5bff332bd9218dcf60",
+    "observer_slot_rva": "0x5CD0BE8",
+    "all_callbacks_forwarded": true,
+    "retry_interval_ms": 250,
+    "readiness_timeout_seconds": 300
+  },
+  "gameplay_validation": {
+    "kind": "owner report",
+    "quote": "it's working flawlessly",
+    "context": "After V3 test requested for drift-zone points, ending zone mode and entering another zone",
+    "independently_instrumented": false,
+    "steam_xbox_achievement_unlocks_verified": false
+  },
+  "local_checks": {
+    "working_build_callback_abi_and_guards": "passed",
+    "staged_and_installed_provider_export_smoke": "passed",
+    "installed_both_targets_match_archive": "passed",
+    "original_road_speed_handler_unchanged": "passed",
+    "portable_archive_fixture": "passed: synthetic private image; no game EXE/dump or log writes",
+    "source_rebuild": "passed using archived source; provider/export smoke passed",
+    "baseline_source_diff": "passed: clean application reproduces integrated source",
+    "archive_copy_and_rollback": "passed on temporary targets: dry-run, install, backup, rollback and unknown-hash refusal",
+    "archive_integrity": "75 inventory entries and 75 SHA256SUMS entries passed"
+  },
+  "toolchain": {
+    "distribution": "llvm-mingw-20261020-ucrt-macos-universal",
+    "compiler": "Clang 23.1.4",
+    "target": "x86_64-w64-windows-gnu",
+    "flags": [
+      "-shared",
+      "-O2",
+      "-Wall"
+    ],
+    "wine_builtin_marker": true,
+    "ordinal_100": "GetBehaviorValue",
+    "ordinal_101": "D3D12CreateDevice"
+  },
+  "artifact_hashes": {
+    "02-rendering/bottle/d3d12.dll": "833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66",
+    "02-rendering/source/d3d12.c": "e4217fec724975adf402c55da7cb450daf51afa18f1e0e0e5e1a622c533f5162",
+    "02-rendering/source/drift_event_gate.h": "25179ccf00fb970ffe30c61ac826c3c67ce245bef7cd65d0fe6938a87ffd2877",
+    "02-rendering/source/drift_capture.h": "5f040353cbd9fda7f7a9305ce94566d34eb9edb7a3133e044c468d63d43a768b",
+    "02-rendering/source/d3d12.def": "b9566216f9b5d20ee48e24cd3fbd7c563b1b55e26520bf34f748d357684ea467"
+  },
+  "excluded": "No game executable, full memory/code dump, raw runtime log, save file, personal bottle configuration or proprietary GPTK runtime added",
+  "runtime_activation_evidence": {
+    "log_basename": "drift-event-gate-1360.txt",
+    "marker": "FH4_DRIFT_OBSERVER v3",
+    "installation_logged": true,
+    "forwarding_to_real_game_objects_logged": true,
+    "raw_log_distributed": false
+  }
+}

@@ -18,6 +18,7 @@ Forza Horizon 4 previously failed on Apple Silicon at three critical checkpoints
 | **Open-World Crash** | **Resolved** | Non-invasive Vectored Exception Handler (VEH) in `d3d12.dll` intercepting `0xC000001D` at `0x140D05DA0` and safely returning to caller `0x140D04D8A`. |
 | **D3DMetal Export Ordinals** | **Resolved** | Custom `d3d12.def` preserving Ordinal 100 (`GetBehaviorValue`) and Ordinal 101 (`D3D12CreateDevice`). |
 | **Free Roam Gameplay** | **Verified Working** | Spawns into open world, discovers roads, and drives continuously across sessions with zero crashes. |
+| **Drift-zone finish/exit** | **User-confirmed working (V3)** | Guarded runtime entry bypass with all normal completion/abort callbacks forwarded. See [the tested build and findings](working-patches/08-drift-zone/README.md); achievement unlocks were not independently verified. |
 
 ---
 
@@ -91,6 +92,7 @@ If you encounter a crash (repeatedly, not a one off thing), graphical glitch, or
 For technical architecture, troubleshooting, and advanced tools, refer to the dedicated guides in `docs/`:
 
 - **[Manual Installation Guide](working-patches/MANUAL_INSTALLATION.md)** — Step-by-step terminal commands, hash-checked copy helpers, and source compilation.
+- **[Drift-zone patch V3](working-patches/08-drift-zone/README.md)** — Working binary/source, install, backup/rollback, failed approaches and live findings.
 - **[Anatomy of the Patches](docs/ANATOMY_OF_PATCHES.md)** — In-depth breakdown of the code cave, vertex layout stride fix, and VEH exception handler.
 - **[Repository & Archive Layout](docs/REPOSITORY_LAYOUT.md)** — Detailed file hierarchy and directory descriptions.
 - **[Verification & Runtime Diagnostics](docs/VERIFICATION_AND_DIAGNOSTICS.md)** — Checksum validation and log verification steps.

@@ -10,6 +10,7 @@
 - [Open-World Free Roam Crash Fix (Vectored Exception Handler Bypass)](#3-open-world-free-roam-crash-fix-vectored-exception-handler-bypass)
 - [Direct3D 12 Proxy Shim Architecture & Ordinal Preservation](#4-direct3d-12-proxy-shim-architecture--ordinal-preservation)
 - [Bottle Configuration & Hardware Profiler Bypass](#5-bottle-configuration--hardware-profiler-bypass)
+- [Drift-zone exit fix V3](#6-drift-zone-exit-fix-v3)
 
 ---
 
@@ -205,3 +206,12 @@ If these ordinals are not defined via `d3d12.def`, the game crashes with a missi
 
 - **Disable Hardware Profiler:** In the captured setup, the profiler DLL was disabled by renaming it to `TargetHardwareProfiler.dll.bak`. That backup is local-only and is not included in Git; this repository does not provide a profiler replacement.
 - **User Settings:** Do not force MSAA or deformable snow off in configuration files; doing so destabilizes the graphics pipeline.
+
+
+## 6. Drift-zone exit fix V3
+
+The final drift fix is integrated in the same proxy and is documented in [08-drift-zone](../working-patches/08-drift-zone/README.md). It waits for exact runtime readiness, checks the supported image and instruction signatures, and changes one in-memory entry byte at RVA `0x895250` from `0x5C` to `0xC3` (RET). The game EXE file remains unchanged. The observer at the MethodObjectInfo vtable records completion/abort events but forwards every original callback exactly once.
+
+This distinction matters: an earlier version stopped the crash by suppressing notifications, but also blocked DriftZoneCompleted, DriftZoneAborted and ReleaseActivityHandle, so points and zone exit failed. V3 restores those handlers while retaining the separate entry bypass. The owner then reported the build working flawlessly. No achievement API was added, and separate achievement unlocks were not verified.
+
+See [the findings](../working-patches/08-drift-zone/FINDINGS.md) for the incorrect early unwind frame, the direct tail-call path, the startup timing issue, exact guarded runtime changes and observed limits. The pre-existing road/speed-zone VEH implementation is unchanged.

@@ -4,7 +4,9 @@
 
 This guide covers manually deploying the pre-compiled, hash-checked patches to your CrossOver engine and Steam bottle using the terminal helper `copy_checked.py`.
 
-The helper validates target hashes, creates unique timestamped backups (`*.bak_fh4_archive_*`), and safely refuses to modify files while the game or CrossOver is running.
+The helper validates target hashes and creates unique timestamped backups (`*.bak_fh4_archive_*`). Its `--game-closed` switch is your explicit assertion; it does not inspect or close running processes. Close FH4 and bottle applications yourself.
+
+**Drift-only upgrade:** if the game already launches and renders correctly, use [08-drift-zone/INSTALL.md](08-drift-zone/INSTALL.md). It updates only the two shim copies and preserves the working GPTK 4 provider, launch patch, graphics settings and saves.
 
 ---
 
@@ -53,7 +55,7 @@ python3 tools/copy_checked.py '01-launch-package/binaries/kernelbase.dll' \
 
 ## Step 4: Ensure D3DMetal Provider (`apd12.dll`) Exists
 
-Verify that CrossOver 26.3's installed Apple GPTK runtime is intact, then install the retained provider DLL in both engine and bottle directories:
+For restoration of the original baseline only, verify that CrossOver 26.3's installed Apple GPTK runtime is intact, then install the retained provider DLL in both engine and bottle directories. **Skip these provider copies for an already-working GPTK 4 drift upgrade**; the tested GPTK 4.0 beta 3 provider differs from the older archived file:
 
 ```bash
 # Engine provider
@@ -72,12 +74,13 @@ The symlink target and D3DMetal framework must already exist in the installed Cr
 
 ## Step 5: Apply Direct3D 12 Proxy Shim (`d3d12.dll`)
 
-This deploys the proxy shim containing both the **explicit vertex offset fix** and the **VEH open-world crash bypass**:
+This deploys the current proxy shim containing the **V3 drift fix**, **explicit vertex offset fix**, and earlier **road/speed-zone VEH bypasses**. Its SHA-256 is `833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66`:
 
 ```bash
 # Patch Bottle d3d12.dll
 python3 tools/copy_checked.py '02-rendering/bottle/d3d12.dll' \
   "$BOTTLE/drive_c/windows/system32/d3d12.dll" \
+  --expected bc9d107e70aeb7e401b77303896b17d53c274fd92415b181f58ace378fb81a44 \
   --expected 6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816 \
   --expected f141fef749e1e18f16670ab439bf3294da8d7d78bc6e3833c07b6dd5e09995c7 \
   --apply --game-closed
@@ -85,6 +88,7 @@ python3 tools/copy_checked.py '02-rendering/bottle/d3d12.dll' \
 # Patch CrossOver Engine d3d12.dll
 python3 tools/copy_checked.py '02-rendering/bottle/d3d12.dll' \
   "$CX/lib64/apple_gptk/wine/x86_64-windows/d3d12.dll" \
+  --expected bc9d107e70aeb7e401b77303896b17d53c274fd92415b181f58ace378fb81a44 \
   --expected 6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816 \
   --expected f141fef749e1e18f16670ab439bf3294da8d7d78bc6e3833c07b6dd5e09995c7 \
   --apply --game-closed
@@ -107,6 +111,7 @@ Open `cxbottle.conf` in a text editor and ensure the `[EnvironmentVariables]` se
 "HB_D3D12_REAL" = "apd12.dll"
 "HB_TSSHIM_EXPLICIT_INPUT_OFFSETS" = "1"
 "HB_TSSHIM_FIX_WORLD_ENTRY" = "1"
+"HB_TSSHIM_FIX_DRIFT_ZONE" = "1"
 "HB_TSSHIM_CAPTURE_BINDINGS" = "0"
 "HB_TSSHIM_CAPTURE_INDIRECT_ARGS" = "0"
 "HB_TSSHIM_SKIP_ALL_INSTANCED" = "0"
@@ -117,20 +122,10 @@ Open `cxbottle.conf` in a text editor and ensure the `[EnvironmentVariables]` se
 
 ---
 
+## Verify drift activation and gameplay
+
+Read `drift-event-gate-<pid>.txt` in the bottle's `drive_c/highball/logs` directory. The current marker is `FH4_DRIFT_OBSERVER v3`; wait for its installation result, then confirm named events are `forwarding`. Test scoring, ending zone mode and entering another zone. These bounded logs do not require verbose graphics logging.
+
 ## Optional: Compiling & Applying from Source
 
-If you prefer compiling the D3D12 proxy shim directly from source:
-```bash
-brew install mingw-w64
-cd "02-rendering/source"
-
-# Compile with strict export definitions
-x86_64-w64-mingw32-gcc -shared -O2 -Wall -static-libgcc \
-  -o d3d12.dll d3d12.c d3d12.def
-
-# Sign with Wine builtin PE header
-python3 mark-builtin.py d3d12.dll
-
-# Verify export ordinals (Ordinal 100 must be GetBehaviorValue, 101 must be D3D12CreateDevice)
-x86_64-w64-mingw32-objdump -p d3d12.dll | grep -E "GetBehaviorValue|D3D12CreateDevice"
-```
+Follow the [V3 build and verification instructions](08-drift-zone/INSTALL.md#optional-build-from-source). Build into a separate directory, use all six headers, preserve `d3d12.def` and the output basename `d3d12.dll`, and run `mark-builtin.py`. Rebuilt binaries need their own verification and hashes.
