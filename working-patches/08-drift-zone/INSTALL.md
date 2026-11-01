@@ -1,3 +1,5 @@
+> The repository now ships the combined V3 + memory V1.1 DLL. Prefer [09-memory-leak/INSTALL.md](../09-memory-leak/INSTALL.md) for the current paired installer with game/runtime checks and automatic transaction recovery. The manual commands below use the current combined binary; the V3-only historical validation remains in this folder.
+
 # Installing the working drift-zone shim
 
 This is a **shim-only upgrade** for an already-running FH4 setup. It replaces the two `d3d12.dll` copies. Preserve the working `kernelbase.dll`, GPTK provider, `apd12.so`, game settings and saves. For the original launch/geometry setup, see [../APPLY.md](../APPLY.md).
@@ -31,7 +33,7 @@ python3 tools/copy_checked.py '02-rendering/bottle/d3d12.dll' "$BOTTLE_DLL" \
   --expected bc9d107e70aeb7e401b77303896b17d53c274fd92415b181f58ace378fb81a44
 ```
 
-These are read-only. If a target already matches V3, the helper reports that and does nothing. If the current hash differs, identify that binary and review its provenance before supplying a different `--expected` hash. Do not defeat the check by blindly accepting any current file.
+These are read-only. If a target already matches the current combined release, the helper reports that and does nothing. If the current hash differs, identify that binary and review its provenance before supplying a different `--expected` hash. Do not defeat the check by blindly accepting any current file.
 
 ## 3. Install, then verify
 
@@ -50,7 +52,7 @@ shasum -a 256 "$ENGINE_DLL" "$BOTTLE_DLL"
 Both installed hashes must be:
 
 ```text
-833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66
+f3038fdc146ff740fb2070d39b16945623fae3958aab963f995ae13f79d25b51
 ```
 
 The helper checks source/target hashes, refuses symlink destinations, backs up each changed file and uses an atomic replacement. **`--game-closed` is your assertion; this helper does not detect or close running applications.** The two calls are separate transactions. If the second fails, restore the first target from its printed backup before launching. Save the printed backup paths and hashes. CrossOver application files may need write permission; ordinary bottle files should not require running the whole recipe as root.
@@ -106,6 +108,6 @@ python3 02-rendering/source/mark-builtin.py 08-drift-zone/build/d3d12.dll
 x86_64-w64-mingw32-objdump -p 08-drift-zone/build/d3d12.dll
 ```
 
-All six headers beside `d3d12.c` are needed. Preserve `d3d12.def`: ordinal 100 is `GetBehaviorValue`, ordinal 101 is `D3D12CreateDevice`. Keep the output basename **`d3d12.dll`**; the tested linker did not reliably obtain the internal DLL name from the DEF when a different basename was used. `mark-builtin.py` writes the required Wine builtin marker; it is not code signing. Rebuilt hashes can differ; validate the build instead of assigning it the archived binary's hash.
+All seven headers beside `d3d12.c` are needed. Preserve `d3d12.def`: ordinal 100 is `GetBehaviorValue`, ordinal 101 is `D3D12CreateDevice`. Keep the output basename **`d3d12.dll`**; the tested linker did not reliably obtain the internal DLL name from the DEF when a different basename was used. `mark-builtin.py` writes the required Wine builtin marker; it is not code signing. Rebuilt hashes can differ; validate the build instead of assigning it the archived binary's hash.
 
 See [verification/README.md](verification/README.md) for the portable isolated tests. Neither rebuilding nor opening the archive installs anything into the running game.

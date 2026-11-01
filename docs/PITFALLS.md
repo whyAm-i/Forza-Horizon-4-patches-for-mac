@@ -18,3 +18,6 @@
 
 > ### 5. Preserve export ordinals in `d3d12.def`
 > If rebuilding `d3d12.dll`, never compile without `d3d12.def`. Forza Horizon 4 links to `GetBehaviorValue` (Ordinal 100) and `D3D12CreateDevice` (Ordinal 101) directly by number. Missing ordinals result in an immediate crash at the splash screen.
+
+> ### 6. Preserve the heap repair’s provenance and page guards
+> [Memory V1.1](../working-patches/09-memory-leak/README.md) changes only two game IAT data pointers after exact image/signature/API checks. Its IAT can be executable copy-on-write; preserve execute permission while writing data and restore the original protection. Never turn the repair into an unchecked pointer[-1] read or blanket pointer subtraction. Use a fresh process for disabling or rolling back the pinned shim.

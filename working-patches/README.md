@@ -6,6 +6,8 @@ Updated 31 October 2026 with the user-confirmed **drift-zone V3** shim. `02-rend
 
 **“Working” means the specific behavior was verified.** The open-world road-discovery illegal-instruction crash (`0x140D05DA0`) is resolved via the Vectored Exception Handler (VEH) bypass patch in `02-rendering`. The VEH intercepts `0xC000001D` faults during Free Roam road discovery and safely returns to caller `0x140D04D8A` without modifying game code on disk or in memory. See `07-evidence/world-entry-veh-bypass.md` and `07-evidence/world-entry-crash-FINDINGS.md`.
 
+The current combined shim also includes [memory repair V1.1](09-memory-leak/README.md), user-confirmed working on 1 November 2026. Its portable installer upgrades an existing supported setup without replacing the provider or changing settings. The older provider remains historical baseline material.
+
 ## What is included
 
 | Folder | What it does | Verification / status |
@@ -17,6 +19,7 @@ Updated 31 October 2026 with the user-confirmed **drift-zone V3** shim. `02-rend
 | `05-game-support` | Current OnlineFix/Steam API and auxiliary compatibility files | Preserved dependencies. Not established as a crash fix; no multiplayer-stability claim. |
 | `06-history` | Earlier assembly, patch scripts and replaced shim revisions | Historical/reference only. Many changes failed, were superseded or were reverted. Do not run as a batch. |
 | `07-evidence` | Selected investigation findings, verification notes, notices and licenses | Supporting records; runtime logs and other local diagnostic captures are excluded. |
+| `09-memory-leak` | Guarded aligned-buffer free repair V1.1, dry-run paired installer/rollback, source diff and portable tests | User-confirmed working; live repaired-free counters and approximately stable occupied heap during continued driving. Total footprint growth is not claimed eliminated. |
 | `08-drift-zone` | V3 installation, backup/rollback, findings, source diff and portable callback/ABI test | User reported “it's working flawlessly” after the final gameplay test. All normal callbacks are forwarded; the exact failing entry is bypassed in memory. |
 
 In the captured game folder, the live EXE was byte-for-byte identical to its `ForzaHorizon4.exe.bak` (SHA-256 `b838a79a65c6d1e12f46deaba3584e4c88ebccdfdc4214b4535ece4ba3c0abbe`). **There is no on-disk EXE patch to apply.** The drift entry change is applied only inside the running process, after its exact runtime signature matches. `kernel32.dll` also matches its saved backup; the old GetPackagePath export-edit scripts are not part of this installed workaround. The latest crash log still reported the missing GetPackagePath implementation during startup.
@@ -40,6 +43,7 @@ The Git archive contains the launch DLL, current proxy and an older baseline pro
 - `HB_TSSHIM_EXPLICIT_INPUT_OFFSETS=1`: keep the visually confirmed geometry fix.
 - `HB_TSSHIM_FIX_WORLD_ENTRY=1`: enables the VEH road-discovery crash bypass at `0x140D05DA0` (default 1 / enabled).
 - The drift fix defaults to enabled with the world-entry fix. `HB_TSSHIM_FIX_DRIFT_ZONE=0` disables its runtime changes. Its bounded log uses `FH4_DRIFT_OBSERVER v3`; drift callbacks must say `forwarding`, not `skipped`.
+- Heap repair defaults enabled. `HB_TSSHIM_FIX_ALIGNED_HEAP=0` disables it before launch. Its bounded log marker is `FH4_ALIGNED_HEAP_FIX v1.1`; an installed marker and repaired counts establish activation.
 - `HB_TSSHIM_CAPTURE_BINDINGS=0`: current normal-play diagnostic state.
 - `HB_TSSHIM_CAPTURE_INDIRECT_ARGS=0`, `HB_TSSHIM_SKIP_ALL_INSTANCED=0`: no argument readback or global instance suppression.
 - `skip.txt` contains only a full-scene baseline comment: no shaders suppressed.

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "captured_at": "2026-10-12T16:00:44.097465+05:30",
+  "captured_at": "2026-11-01T19:28:55.258263+05:30",
   "files": {
     "01-launch-package/README.md": {
       "type": "file",
@@ -16,8 +16,8 @@
     },
     "02-rendering/README.md": {
       "type": "file",
-      "size": 4088,
-      "sha256": "227ec82525b648692fadf9d8caaefea71884b20d3285a708b5a146125f3de715",
+      "size": 4270,
+      "sha256": "dd1ba1f1ae9cec0b0b23095396dff064b7d3e685325498e7cab68b987a8e60ea",
       "source": "generated"
     },
     "02-rendering/bottle/apd12.dll": {
@@ -28,9 +28,15 @@
     },
     "02-rendering/bottle/d3d12.dll": {
       "type": "file",
-      "size": 223744,
-      "sha256": "833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66",
-      "source": "${GAME_ROOT}/drift-zone-work/build/d3d12.dll (exact installed V3)"
+      "size": 229888,
+      "sha256": "f3038fdc146ff740fb2070d39b16945623fae3958aab963f995ae13f79d25b51",
+      "source": "Exact installed gameplay-tested aligned-heap V1.1 combined shim; preserved V3/rendering behavior"
+    },
+    "02-rendering/source/aligned_heap_fix.h": {
+      "type": "file",
+      "size": 12945,
+      "sha256": "667fba38585d9729b117f6237eef5088b5608648f3c448aa60261c79b02e62c1",
+      "source": "Memory repair V1.1, portable source/tools and owner-confirmed gameplay (2026-11-01)"
     },
     "02-rendering/source/binding_capture.h": {
       "type": "file",
@@ -40,9 +46,9 @@
     },
     "02-rendering/source/d3d12.c": {
       "type": "file",
-      "size": 157084,
-      "sha256": "e4217fec724975adf402c55da7cb450daf51afa18f1e0e0e5e1a622c533f5162",
-      "source": "${GAME_ROOT}/drift-zone-work/src/d3d12.c (V3 integrated source)"
+      "size": 157162,
+      "sha256": "0511739497a367e521a7607114bfb555bde1d2a1c00629d06e02d541001faed0",
+      "source": "V3 source plus three V1.1 integration lines; see 09-memory-leak/memory-leak-v1.1.patch"
     },
     "02-rendering/source/d3d12.c.bak_before_speedzone_fix": {
       "type": "file",
@@ -58,9 +64,9 @@
     },
     "02-rendering/source/d3d12.dll": {
       "type": "file",
-      "size": 223744,
-      "sha256": "833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66",
-      "source": "same tested V3 binary as 02-rendering/bottle/d3d12.dll"
+      "size": 229888,
+      "sha256": "f3038fdc146ff740fb2070d39b16945623fae3958aab963f995ae13f79d25b51",
+      "source": "Exact installed gameplay-tested aligned-heap V1.1 combined shim; preserved V3/rendering behavior"
     },
     "02-rendering/source/descriptor_capture.h": {
       "type": "file",
@@ -118,8 +124,8 @@
     },
     "02-rendering/verification/test_input_offsets.c": {
       "type": "file",
-      "size": 4908,
-      "sha256": "92c34930118d8055c8293e44b26205962488e53215eef3d292a6d501ae409cef",
+      "size": 4885,
+      "sha256": "481a409c5c0df02fd2dc3bc2c3252b73129ee75f91de564913235c19bce7bf8f",
       "source": "${GAME_ROOT}/diagnostics/2026-10-11/test_input_offsets.c"
     },
     "03-settings/README.md": {
@@ -292,8 +298,8 @@
     },
     "07-evidence/changes_log.md": {
       "type": "file",
-      "size": 63768,
-      "sha256": "8f3c64af62bc440ff0332bc5f9bba52249eb9e40d7ad3e6a9aef01ba2a89159e",
+      "size": 64671,
+      "sha256": "0b3f05dec7374632d6c115c698703409e116b24a56c3c17fd02d211ab19b6ccb",
       "source": "${GAME_ROOT}/changes_log.md"
     },
     "07-evidence/diagnostic-deployment-README.md": {
@@ -364,26 +370,26 @@
     },
     "08-drift-zone/BACKUP_AND_ROLLBACK.md": {
       "type": "file",
-      "size": 3258,
-      "sha256": "ab4f0ca89daabc4b1e14c8bdf403a59a64792f8838cc7784b7388bc0d2e4daf6",
+      "size": 3520,
+      "sha256": "137c115d575c76d6a19d6346222c168e50305bcb9e9bba5d19dd1f6b26284f0d",
       "source": "V3 investigation, portable verification, and owner-confirmed gameplay result (2026-10-31)"
     },
     "08-drift-zone/FINDINGS.md": {
       "type": "file",
-      "size": 6445,
-      "sha256": "2b0dbddee80936b543b9322607f03d78a9a39ecc3359f3f25d739d14dc3943c9",
+      "size": 6136,
+      "sha256": "2196d6aaa002dc4296bc8fe34921d1ad2e9fae7af3d7f2fe0381967e70ff6622",
       "source": "V3 investigation, portable verification, and owner-confirmed gameplay result (2026-10-31)"
     },
     "08-drift-zone/INSTALL.md": {
       "type": "file",
-      "size": 6781,
-      "sha256": "56433aaa822c6262e8d61cebc281ed65b538800d02e344ef667402012013fe83",
+      "size": 7148,
+      "sha256": "390ba7cddd1ad94326d3d042a4b360ee2e4be661fe2f81654d759e3089c31706",
       "source": "V3 investigation, portable verification, and owner-confirmed gameplay result (2026-10-31)"
     },
     "08-drift-zone/README.md": {
       "type": "file",
-      "size": 4321,
-      "sha256": "36c30ac6cc31382af77cf17a1825a5c2a0e13f99c0747ab722de5c4e9c11e492",
+      "size": 4539,
+      "sha256": "5db4be0e3563a8a8407f900dfd523c163d4461028e3a08a5c0e9b54780e2e2da",
       "source": "V3 investigation, portable verification, and owner-confirmed gameplay result (2026-10-31)"
     },
     "08-drift-zone/drift-zone-v3.patch": {
@@ -422,22 +428,106 @@
       "sha256": "5024c253ea6292264a1aaeee659cd6fc64d2345bf6f5199487b3b8a185bd46fa",
       "source": "V3 investigation, portable verification, and owner-confirmed gameplay result (2026-10-31)"
     },
+    "09-memory-leak/BACKUP_AND_ROLLBACK.md": {
+      "type": "file",
+      "size": 2759,
+      "sha256": "618a7c31b6a687af7816393d56e670383d7fc96e5545922ece75e44ebcca0434",
+      "source": "Memory repair V1.1, portable source/tools and owner-confirmed gameplay (2026-11-01)"
+    },
+    "09-memory-leak/FINDINGS.md": {
+      "type": "file",
+      "size": 4912,
+      "sha256": "b3ef2792dab446be105f1767cf569e335a1c2da6e067d87a8db7becc0ab7c548",
+      "source": "Memory repair V1.1, portable source/tools and owner-confirmed gameplay (2026-11-01)"
+    },
+    "09-memory-leak/INSTALL.md": {
+      "type": "file",
+      "size": 5542,
+      "sha256": "47ebe31600b5ccc7cc3da3350c883e26bf536444e8cbf37436cdac92f5ea8093",
+      "source": "Memory repair V1.1, portable source/tools and owner-confirmed gameplay (2026-11-01)"
+    },
+    "09-memory-leak/README.md": {
+      "type": "file",
+      "size": 4156,
+      "sha256": "9bc745de08859066545be12eb4f6746ee576a654140864da52343dc77dd2ddd5",
+      "source": "Memory repair V1.1, portable source/tools and owner-confirmed gameplay (2026-11-01)"
+    },
+    "09-memory-leak/build.py": {
+      "type": "file",
+      "size": 2155,
+      "sha256": "a19ce97d9a7120b7e823f92bbc980b8f258d27e53bb43c02061e12c5fe61f3b2",
+      "source": "Memory repair V1.1, portable source/tools and owner-confirmed gameplay (2026-11-01)"
+    },
+    "09-memory-leak/install.py": {
+      "type": "file",
+      "size": 12898,
+      "sha256": "7ec40b7e9f99a10de351cb6a3039fb3a9956849884943009d9317ab3b122a65a",
+      "source": "Memory repair V1.1, portable source/tools and owner-confirmed gameplay (2026-11-01)"
+    },
+    "09-memory-leak/memory-leak-v1.1.patch": {
+      "type": "file",
+      "size": 14137,
+      "sha256": "e8f0f6e51c7bcdbfd601156c096cce9f0d452905d3bc0bf4cf42a8847eac8a5a",
+      "source": "Memory repair V1.1, portable source/tools and owner-confirmed gameplay (2026-11-01)"
+    },
+    "09-memory-leak/run_tests.py": {
+      "type": "file",
+      "size": 3832,
+      "sha256": "5f2ff0403c236c956cf68f3a597112e03c2f323f03092c0bb9c7fe06c59b7b9f",
+      "source": "Memory repair V1.1, portable source/tools and owner-confirmed gameplay (2026-11-01)"
+    },
+    "09-memory-leak/validation.json": {
+      "type": "file",
+      "size": 4192,
+      "sha256": "0a5120487d87ba32a00bc739391ef01a7cd0acbedcd86955ed459241a7aad449",
+      "source": "Memory repair V1.1, portable source/tools and owner-confirmed gameplay (2026-11-01)"
+    },
+    "09-memory-leak/verification/README.md": {
+      "type": "file",
+      "size": 3225,
+      "sha256": "82d64b47d6402ab4534d6e9d9c25929f0341ca4d8badae60069293ea4f8f4775",
+      "source": "Memory repair V1.1, portable source/tools and owner-confirmed gameplay (2026-11-01)"
+    },
+    "09-memory-leak/verification/cow_fixture.c": {
+      "type": "file",
+      "size": 357,
+      "sha256": "3ac03736b2856143a5d6a892f65b6bf4dd7436d7f553877d4a3afde8165bb06d",
+      "source": "Memory repair V1.1, portable source/tools and owner-confirmed gameplay (2026-11-01)"
+    },
+    "09-memory-leak/verification/smoke.c": {
+      "type": "file",
+      "size": 1871,
+      "sha256": "9a44c045c906056ef3e3ee8ed66c59ac99bb7ee7d5fd9cffbb235e3bae68b007",
+      "source": "Memory repair V1.1, portable source/tools and owner-confirmed gameplay (2026-11-01)"
+    },
+    "09-memory-leak/verification/test_aligned_heap.c": {
+      "type": "file",
+      "size": 13727,
+      "sha256": "6dafe7ee34ebb7e0679382cd7af4734ea4f8258c0005801d4e96db6dd1f2152d",
+      "source": "Memory repair V1.1, portable source/tools and owner-confirmed gameplay (2026-11-01)"
+    },
+    "09-memory-leak/verification/test_install.py": {
+      "type": "file",
+      "size": 8695,
+      "sha256": "7b81b1dd00825654f9ef46f1829b94125a0d58c12fee7297dfc8b6255d2d18b4",
+      "source": "Memory repair V1.1, portable source/tools and owner-confirmed gameplay (2026-11-01)"
+    },
     "APPLY.md": {
       "type": "file",
-      "size": 12126,
-      "sha256": "be7ab44e3ea8afcb0557ffa230f356b8d6d1f997ab34e0e0ff0e95f2f15bf72b",
+      "size": 12877,
+      "sha256": "719b66e61f06a5eeb1158de330efea03f54389f1cbcba9893ffeaae017eea95b",
       "source": "generated"
     },
     "MANUAL_INSTALLATION.md": {
       "type": "file",
-      "size": 5702,
-      "sha256": "e0a0509bdae3bc05dfeee8f09b1b67f1e7ac2eab46682280c8a948f1941b1fd0",
+      "size": 6143,
+      "sha256": "df831e0d17ec7044178064a2f3a0f1801bd0078bbfcf2971e4abb1b8edcd8a67",
       "source": "generated"
     },
     "README.md": {
       "type": "file",
-      "size": 6211,
-      "sha256": "086bf3baeb55a436a16d1b8706544dd7b8e3891f819d2311df5b66b77791e6fd",
+      "size": 7019,
+      "sha256": "bb6889bfe1e8bafb211dad518a147a42294a5e95bda0ec8ed7aad0bec4e639e6",
       "source": "generated"
     },
     "tools/copy_checked.py": {
@@ -459,5 +549,6 @@
     "status": "owner-confirmed working",
     "guide": "08-drift-zone/README.md",
     "shim_sha256": "833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66"
-  }
+  },
+  "current_release": "FH4 aligned-buffer repair V1.1 plus retained drift V3/rendering/world fixes"
 }

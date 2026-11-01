@@ -2797,6 +2797,7 @@ static void patch_device(ID3D12Device *dev)
 static void drift_arm_first_chance(void);
 static void drift_disarm_first_chance(void);
 static void drift_start_event_gate(void);
+static void ah_start(void);
 static void drift_remove_event_gate(void);
 
 // ---- exports -------------------------------------------------------------------------------
@@ -2811,6 +2812,7 @@ HRESULT WINAPI D3D12CreateDevice(IUnknown *adapter, D3D_FEATURE_LEVEL level, REF
     if (SUCCEEDED(hr) && out && *out) {
         drift_arm_first_chance();
         drift_start_event_gate();
+        ah_start();
     }
     if (SUCCEEDED(hr) && out && *out && !idle) {
         ID3D12Device *dev = NULL; IUnknown *u = (IUnknown *)*out;
@@ -2912,6 +2914,7 @@ static BOOL is_preceded_by_call(DWORD64 ret_addr)
 }
 
 #include "drift_event_gate.h"
+#include "aligned_heap_fix.h"
 #include "drift_capture.h"
 
 static PVOID g_veh_world_entry_fix = NULL;

@@ -4,6 +4,8 @@
 
 ---
 
+For the current paired memory/shim installer, use [09-memory-leak/BACKUP_AND_ROLLBACK.md](../working-patches/09-memory-leak/BACKUP_AND_ROLLBACK.md). It creates a two-target manifest and verified backups; the instructions below cover the older single-file copy helper.
+
 ## Automatic Backups
 
 Every time you run the deployment tool `copy_checked.py` with `--apply`, it automatically creates a uniquely timestamped backup file before overwriting anything:

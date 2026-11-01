@@ -1,3 +1,5 @@
+For installations made by the current memory installer, use its [manifest-based paired rollback](../09-memory-leak/BACKUP_AND_ROLLBACK.md). The separate-copy workflow below remains available for earlier/manual installations.
+
 # Backup and rollback
 
 Close FH4, Steam and bottle applications before installation or restoration. Restore the two corresponding DLL backups as a pair. Process-memory changes disappear when that game process exits; no patched EXE file needs restoration.
@@ -27,14 +29,14 @@ ENGINE_BACKUP="$TASK_BACKUP/engine-d3d12.dll"
 BOTTLE_BACKUP="$TASK_BACKUP/bottle-d3d12.dll"
 ENGINE_BACKUP_SHA='REPLACE_WITH_RECORDED_ENGINE_BACKUP_SHA256'
 BOTTLE_BACKUP_SHA='REPLACE_WITH_RECORDED_BOTTLE_BACKUP_SHA256'
-V3_SHA='833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66'
+SHIM_SHA='f3038fdc146ff740fb2070d39b16945623fae3958aab963f995ae13f79d25b51'
 python3 tools/copy_checked.py "$ENGINE_BACKUP" "$ENGINE_DLL" \
-  --source-sha256 "$ENGINE_BACKUP_SHA" --expected "$V3_SHA"
+  --source-sha256 "$ENGINE_BACKUP_SHA" --expected "$SHIM_SHA"
 python3 tools/copy_checked.py "$BOTTLE_BACKUP" "$BOTTLE_DLL" \
-  --source-sha256 "$BOTTLE_BACKUP_SHA" --expected "$V3_SHA"
+  --source-sha256 "$BOTTLE_BACKUP_SHA" --expected "$SHIM_SHA"
 ```
 
-Review both dry runs, then repeat each command with `--apply --game-closed`. The helper also backs up the current V3 target before restoring the older copy. Verify both final hashes against the saved backup list before restarting. If a live target no longer has V3's hash, investigate later changes before restoring anything.
+Review both dry runs, then repeat each command with `--apply --game-closed`. The helper also backs up the current combined target before restoring the older copy. Verify both final hashes against the saved backup list before restarting. If a live target no longer has the recorded current release hash, investigate later changes before restoring anything.
 
 Only restore `cxbottle.conf` if you changed it for installation and have reviewed any later desired edits. This shim-only upgrade does not require overwriting configuration, saves, providers, or the complete bottle.
 

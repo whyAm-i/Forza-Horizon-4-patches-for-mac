@@ -1,3 +1,5 @@
+> The current `02-rendering` binary also includes memory repair V1.1. Use [the current installer](../09-memory-leak/INSTALL.md) for that combined release. The V3-only hash and validation below describe the original 31 October milestone; its observer/entry implementation remains unchanged.
+
 # Drift-zone exit fix
 
 This is the current D3D12 shim, including the earlier geometry, launch-provider forwarding, road-discovery and speed-zone compatibility code. It is already integrated into `../02-rendering`; do not apply the older experimental drift versions alongside it.
@@ -5,7 +7,7 @@ This is the current D3D12 shim, including the earlier geometry, launch-provider 
 | Item | Value |
 | --- | --- |
 | Installable DLL | `../02-rendering/bottle/d3d12.dll` |
-| SHA-256 | `833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66` |
+| Original V3-only SHA-256 | `833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66` |
 | Game tested | FH4 `1.478.564.0`, x64 |
 | Game EXE SHA-256 | `b838a79a65c6d1e12f46deaba3584e4c88ebccdfdc4214b4535ece4ba3c0abbe` |
 | CrossOver tested | `26.3`, build `26.3.0.39832`, Apple Silicon |
@@ -29,11 +31,11 @@ The previous custom drift exception-unwind handlers are not compiled into this b
 - `../02-rendering/source/d3d12.c`: integrated shim source.
 - `../02-rendering/source/drift_event_gate.h`: V3 observer, guarded entry patch, readiness retry and restoration. The filename is retained from the investigation; V3 does not gate/drop callbacks.
 - `../02-rendering/source/drift_capture.h`: capture-only diagnostics.
-- `../02-rendering/bottle/d3d12.dll`: exact tested, user-confirmed binary. The existing `source/d3d12.dll` duplicate is kept byte-identical for the repo's established layout.
+- `../02-rendering/bottle/d3d12.dll`: current combined binary, including the retained V3 behavior; see the memory guide for its current hash. The existing `source/d3d12.dll` duplicate is kept byte-identical for the repo's established layout.
 - `drift-zone-v3.patch`: reviewable source diff against pre-drift commit `a5b6f5df77f657965722d899a73899a90b8484e0`. Current source is already integrated; do not apply the diff again.
 - `verification/`: portable synthetic-fixture callback/ABI test, assembly register probe, and loader smoke-test source. No EXE, full game code dump, minidump, save file or runtime log is bundled.
 
-The source/binary were copied from the installed V3 build, not rebuilt while packaging. Earlier attempts and their DLL backups remain local investigation history; they are not advertised as working patches.
+The original V3 milestone was packaged from its installed binary. The current integrated source/binary now also include the memory repair; the original V3 source diff/validation remain historical and do not alone reproduce today’s combined source. Earlier attempts and their DLL backups remain local investigation history; they are not advertised as working patches.
 
 ## Scope
 

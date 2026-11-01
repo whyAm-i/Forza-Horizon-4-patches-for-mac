@@ -1,8 +1,8 @@
 # Applying the captured setup correctly
 
-These instructions restore the **captured CrossOver 26.3 setup**, including the current drift-zone V3 shim, earlier VEH world/speed-zone bypasses and geometry fix.
+These instructions restore the **captured CrossOver 26.3 setup**, including memory repair V1.1 and the retained drift-zone V3 shim, earlier VEH world/speed-zone bypasses and geometry fix.
 
-For a working bottle that only needs the drift update, use [08-drift-zone/INSTALL.md](08-drift-zone/INSTALL.md) and preserve the existing GPTK provider. The V3 gameplay confirmation used GPTK 4.0 beta 3; the archived provider is an older baseline. Use the matched binaries already in this archive. Original sources/scripts are reference material; running every historical patch would combine incompatible experiments.
+For a working bottle needing the memory update, use [09-memory-leak/INSTALL.md](09-memory-leak/INSTALL.md). For background on the retained drift behavior, use [08-drift-zone/INSTALL.md](08-drift-zone/INSTALL.md) and preserve the existing GPTK provider. The V3 gameplay confirmation used GPTK 4.0 beta 3; the archived provider is an older baseline. Use the current custom shim in this archive and preserve the required matched provider already installed. Original sources/scripts are reference material; running every historical patch would combine incompatible experiments.
 
 ## 1. Prepare and verify
 
@@ -37,24 +37,26 @@ Read `01-launch-package/README.md` for the actual changed ranges and package ide
 
 ## 3. Restore the D3D12 proxy and matched provider
 
-The main shim is `02-rendering/bottle/d3d12.dll`. Use that one retained file for both the bottle and engine targets. SHA-256: `833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66` (V3 drift observer/entry bypass, preserving the existing Speed Zone dynamic stack scan VEH bypass; prior road/speed shim was `bc9d107e70aeb7e401b77303896b17d53c274fd92415b181f58ace378fb81a44`; road-discovery-only VEH hash was `facc38fb8affbf579153bcc54de3b063fb99fd9be1513988f9e2eda1ee8ad1e6`; pre-VEH v5 hash was `6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816`).
+The main shim is `02-rendering/bottle/d3d12.dll`. Use that one retained file for both the bottle and engine targets. SHA-256: `f3038fdc146ff740fb2070d39b16945623fae3958aab963f995ae13f79d25b51` (memory repair V1.1 plus V3 drift observer/entry bypass, preserving the existing Speed Zone dynamic stack scan VEH bypass; prior road/speed shim was `bc9d107e70aeb7e401b77303896b17d53c274fd92415b181f58ace378fb81a44`; road-discovery-only VEH hash was `facc38fb8affbf579153bcc54de3b063fb99fd9be1513988f9e2eda1ee8ad1e6`; pre-VEH v5 hash was `6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816`).
 
-For the original provider baseline described below (not the shim-only drift upgrade), confirm the CrossOver application already contains its stock `lib64/apple_gptk/external/libd3dshared.dylib` and D3DMetal framework. These proprietary runtime files are prerequisites and are not bundled. The retained `02-rendering/bottle/apd12.dll` hashes to `f1bcaa4d79e4353e075e7f284ebcb2d44a1b0cb2aa88f01f6341dc3c518b976f`; install it in both the engine and bottle. The engine's `wine/x86_64-unix/apd12.so` must be a relative symlink to `../../external/libd3dshared.dylib`.
+The combined memory/drift release requires the already-working GPTK 4.0 beta 3 provider, SHA-256 `32c942ed368a45e58d35f4da3de3776d1f74e785731de9cf6a5e705a2925488a`, at both installed apd12.dll locations. Preserve its matched CrossOver runtime and the engine's `apd12.so` link. The older archived `02-rendering/bottle/apd12.dll` is historical baseline material and is not the provider used for this release. Do not copy it over the working setup. If the matched runtime is absent, prepare/repair the supported CrossOver/GPTK installation first; the runtime is not vendored here.
+
+For a supported V3 or road/speed setup, prefer the [paired memory installer](09-memory-leak/INSTALL.md), which checks game/runtime identities and backs up both targets before replacing either. The lower-level copying commands below remain available for reviewed initial setup states. They do not perform those extra compatibility checks.
 
 Known prior shim hashes:
+
+- Drift V3 before the memory repair: `833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66`
 - Pre-drift road/speed-zone shim: `bc9d107e70aeb7e401b77303896b17d53c274fd92415b181f58ace378fb81a44`
 - Road-discovery-only VEH shim: `facc38fb8affbf579153bcc54de3b063fb99fd9be1513988f9e2eda1ee8ad1e6`
 - Pre-VEH v5 shim: `6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816`
 - Initial deployment backup: `f141fef749e1e18f16670ab439bf3294da8d7d78bc6e3833c07b6dd5e09995c7`
 
 ```sh
-python3 tools/copy_checked.py '02-rendering/bottle/d3d12.dll' "$BOTTLE/drive_c/windows/system32/d3d12.dll" --expected bc9d107e70aeb7e401b77303896b17d53c274fd92415b181f58ace378fb81a44 --expected 52bdcd0abe16b7b99af4f127c7f04a0fde1195da5fa6c19cb9b4f12f371e6c5e --expected facc38fb8affbf579153bcc54de3b063fb99fd9be1513988f9e2eda1ee8ad1e6 --expected 6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816 --expected f141fef749e1e18f16670ab439bf3294da8d7d78bc6e3833c07b6dd5e09995c7
-python3 tools/copy_checked.py '02-rendering/bottle/d3d12.dll' "$CX/lib64/apple_gptk/wine/x86_64-windows/d3d12.dll" --expected bc9d107e70aeb7e401b77303896b17d53c274fd92415b181f58ace378fb81a44 --expected 52bdcd0abe16b7b99af4f127c7f04a0fde1195da5fa6c19cb9b4f12f371e6c5e --expected facc38fb8affbf579153bcc54de3b063fb99fd9be1513988f9e2eda1ee8ad1e6 --expected 1b7a02cb37ec6b484e2aaa76b5ec9cbb47e63aeec29dbe087d5d1589a3347cfb --expected 6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816 --expected f141fef749e1e18f16670ab439bf3294da8d7d78bc6e3833c07b6dd5e09995c7
+python3 tools/copy_checked.py '02-rendering/bottle/d3d12.dll' "$BOTTLE/drive_c/windows/system32/d3d12.dll" --expected 833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66 --expected bc9d107e70aeb7e401b77303896b17d53c274fd92415b181f58ace378fb81a44 --expected 52bdcd0abe16b7b99af4f127c7f04a0fde1195da5fa6c19cb9b4f12f371e6c5e --expected facc38fb8affbf579153bcc54de3b063fb99fd9be1513988f9e2eda1ee8ad1e6 --expected 6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816 --expected f141fef749e1e18f16670ab439bf3294da8d7d78bc6e3833c07b6dd5e09995c7
+python3 tools/copy_checked.py '02-rendering/bottle/d3d12.dll' "$CX/lib64/apple_gptk/wine/x86_64-windows/d3d12.dll" --expected 833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66 --expected bc9d107e70aeb7e401b77303896b17d53c274fd92415b181f58ace378fb81a44 --expected 52bdcd0abe16b7b99af4f127c7f04a0fde1195da5fa6c19cb9b4f12f371e6c5e --expected facc38fb8affbf579153bcc54de3b063fb99fd9be1513988f9e2eda1ee8ad1e6 --expected 1b7a02cb37ec6b484e2aaa76b5ec9cbb47e63aeec29dbe087d5d1589a3347cfb --expected 6d6753139742c5f39961ec64021ede30308cdd991630797a355d3f5db342a816 --expected f141fef749e1e18f16670ab439bf3294da8d7d78bc6e3833c07b6dd5e09995c7
 ```
 
-Other prior shim revisions are captured in history. If installing onto a stock file with a different hash, verify that it belongs to the exact supported CrossOver build rather than bypassing the guard. The older archived provider belongs to the original baseline. For the drift upgrade, preserve a working matched GPTK 4 provider/runtime pair as described in the drift guide; do not replace it merely to reproduce this older provider hash. The game-folder root should not have an additional `d3d12.dll` overriding these targets.
-
-Copy the retained provider to the engine's `wine/x86_64-windows` directory and bottle `system32`, backing up existing files first. Recreate the engine symlink only when its installed CrossOver target exists:
+If a current hash differs from a reviewed prior state, identify its exact version instead of bypassing the guard. The game-folder root should not contain another d3d12.dll overriding the two selected targets. Preserve the installed matched provider DLLs; do not copy the older archived provider. Recreate the engine link only when absent and its installed runtime target exists:
 
 ```sh
 # Only if the link is absent and ../../external/libd3dshared.dylib exists:
@@ -94,9 +96,11 @@ The local `TargetHardwareProfiler.dll.bak` disabled-profiler backup is not inclu
 
 ## 6. Rebuild, if needed
 
-The current integrated source has six header dependencies and the mandatory `d3d12.def`. Use the [V3 build instructions](08-drift-zone/INSTALL.md#optional-build-from-source) to compile into a separate build directory, preserve the internal basename `d3d12.dll`, mark it as Wine builtin, and verify ordinals 100/101. Do not overwrite the archived source-folder DLL while experimenting. A rebuilt DLL can have a different checksum from the exact archived working binary.
+The current integrated source has seven header dependencies and the mandatory `d3d12.def`. Use the [portable current build instructions](09-memory-leak/verification/README.md) to compile into a separate build directory, preserve the internal basename `d3d12.dll`, mark it as Wine builtin, and verify ordinals 100/101. Do not overwrite the archived source-folder DLL while experimenting. A rebuilt DLL can have a different checksum from the exact archived working binary.
 
 ## 7. Verify after a normal restart
+
+For the heap repair, inspect `aligned-heap-fix-<Windows PID>.txt` for `FH4_ALIGNED_HEAP_FIX v1.1`, an installed result, and increasing repaired counts. A timeout/declined guard is not activation. The log stops after 96 lines by design. See [the measured limits](09-memory-leak/FINDINGS.md).
 
 - Confirm engine and bottle kernelbase/shim/provider hashes match the archive.
 - With logging enabled, the newest startup marker should show `binding-capture-v5; bindings=0; input_offsets=1`.

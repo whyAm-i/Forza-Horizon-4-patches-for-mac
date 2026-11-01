@@ -1,6 +1,6 @@
 # Rendering compatibility and geometry fix
 
-The current archived DLL also includes the **user-confirmed drift-zone V3 fix** from 31 October 2026. SHA-256: `833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66`. The new [drift guide](../08-drift-zone/README.md) covers installation, backup/rollback, exact runtime changes and findings. Earlier road/speed-zone code remains unchanged.
+The current archived DLL includes the **user-confirmed memory repair V1.1** and the **drift-zone V3 fix**. SHA-256: `f3038fdc146ff740fb2070d39b16945623fae3958aab963f995ae13f79d25b51`. Use the [memory upgrade installer](../09-memory-leak/INSTALL.md) for both shim copies, preserving the matched GPTK 4 provider. The [drift guide](../08-drift-zone/README.md) describes the retained drift behavior; earlier road/speed-zone code is unchanged.
 
 The installed `binding-capture-v5` proxy contains the visually confirmed explicit-input-offset workaround. It resolves D3D12_APPEND_ALIGNED_ELEMENT into explicit byte offsets per input slot before pipeline creation/loading. This corrects packed attribute interpretation rather than suppressing trees, foliage or crowds. Existing explicit offsets and app-owned descriptors are preserved. All four creation/load paths are covered.
 
@@ -12,6 +12,7 @@ The same DLL retains timestamp emulation using CPU QPC stamps (not true GPU timi
 
 - `bottle/d3d12.dll`: current proxy, used for both bottle and engine targets.
 - `bottle/apd12.dll`: renamed real D3DMetal provider, with internal name adjusted to avoid resolving back to the proxy.
+- `source/aligned_heap_fix.h`: bounded allocation-provenance repair and exact runtime guards.
 - `source`: current C source, binding_capture.h, descriptor_capture.h, upload_capture.h, input_offsets.h, d3d12.def and Wine-marker tool.
 - `source/drift_event_gate.h` and `source/drift_capture.h`: V3 observer/readiness/entry bypass and capture-only diagnostics. Despite the historical filename, V3 forwards every callback; it does not block completion or activity release.
 - `verification`: source/probes/recorded evidence. They are not automatically executed by opening the archive.

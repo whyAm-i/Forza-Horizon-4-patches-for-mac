@@ -11,7 +11,7 @@ After deploying the patches, verify that the active files in your bottle match t
 ```bash
 # Check d3d12.dll
 shasum -a 256 "$BOTTLE/drive_c/windows/system32/d3d12.dll"
-# Expected current V3: 833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66
+# Expected current combined V3 + memory V1.1: f3038fdc146ff740fb2070d39b16945623fae3958aab963f995ae13f79d25b51
 
 # Check kernelbase.dll
 shasum -a 256 "$BOTTLE/drive_c/windows/system32/kernelbase.dll"
@@ -19,6 +19,10 @@ shasum -a 256 "$BOTTLE/drive_c/windows/system32/kernelbase.dll"
 ```
 
 ---
+
+## Memory fix
+
+Check `aligned-heap-fix-<Windows PID>.txt` for `FH4_ALIGNED_HEAP_FIX v1.1`, successful installation and increasing repaired counts. No verbose graphics logging is needed. The file caps at 96 lines intentionally; stopped logging alone does not imply stopped repairs. Cumulative requested bytes are allocation traffic, not resident memory savings. See [portable tests and evidence](../working-patches/09-memory-leak/verification/README.md).
 
 ## Drift-zone V3 activation
 

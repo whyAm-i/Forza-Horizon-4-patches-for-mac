@@ -1,0 +1,98 @@
+{
+  "patch": "FH4 aligned-buffer heap compatibility repair V1.1",
+  "recorded_on": "2026-11-01",
+  "baseline_commit": "626b1c72e90b7dfd71646423f31aab1f45374f9c",
+  "artifact_sha256": "f3038fdc146ff740fb2070d39b16945623fae3958aab963f995ae13f79d25b51",
+  "binary_origin": "Exact installed gameplay-tested V1.1 DLL; not rebuilt for the release archive",
+  "game": {
+    "version": "1.478.564.0",
+    "architecture": "AMD64",
+    "exe_sha256": "b838a79a65c6d1e12f46deaba3584e4c88ebccdfdc4214b4535ece4ba3c0abbe",
+    "pe_timestamp": "0x655e0821",
+    "size_of_image": "0x9b10e00",
+    "exe_file_modified": false
+  },
+  "environment": {
+    "crossover": "26.3.0.39832",
+    "macos": "27",
+    "chip": "Apple M4",
+    "gptk": "4.0 beta 3",
+    "metal4": true,
+    "provider_sha256": "32c942ed368a45e58d35f4da3de3776d1f74e785731de9cf6a5e705a2925488a",
+    "older_archived_provider_is_not_current_release_provider": true
+  },
+  "runtime_changes": {
+    "heap_alloc_iat_rva": "0x8820390",
+    "heap_free_iat_rva": "0x8820388",
+    "alloc_return_rva": "0x37fe7c3",
+    "free_return_rva": "0x37fe9ad",
+    "fixed_table_bytes": 1048576,
+    "log_line_cap": 96,
+    "supports_executable_copy_on_write_iat": true,
+    "previous_drift_changes_retained": true,
+    "new_game_instruction_changes": false
+  },
+  "owner_report": {
+    "quote": "the patches work",
+    "recorded_on": "2026-11-01",
+    "context": "After live activation and two driving checkpoint captures; user requested packaging in the patches Git repository"
+  },
+  "live_observation": {
+    "same_process_lifetime_verified": true,
+    "lap1_to_lap2_minutes": 41.51,
+    "user_driving_context": "Driving for most of the interval",
+    "occupied_regular_heap_change_bytes": -11352768,
+    "total_footprint_change_bytes": 478876872,
+    "successful_repaired_frees_at_later_counter_read": 559372,
+    "cumulative_requested_bytes_repaired": 2552086740,
+    "table_drops": 0,
+    "metadata_rejections": 0,
+    "counter_read_atomic_with_memory_snapshot": false,
+    "all_memory_growth_eliminated": false,
+    "lap3_capture_recorded": false
+  },
+  "package_checks": {
+    "source_rebuild": "passed; rebuilt DLL is separate from released artifact",
+    "source_diff_against_v3": "passed; clean application reproduces both integrated files",
+    "installer_temporary_filesystem_tests": {
+      "passed": 12
+    },
+    "isolated_tests": {
+      "allocator-readonly": "passed",
+      "allocator-cow-image": "passed",
+      "process-name-guard": "passed",
+      "invalid-original": "passed",
+      "invalid-patched": "passed",
+      "released-provider-exports": "passed",
+      "rebuilt-provider-exports": "passed",
+      "render-input-regression": "passed",
+      "drift-abi-regression": "passed"
+    },
+    "allocator_pairs_per_page_type": 80000,
+    "allocator_cases_per_page_type": 423,
+    "self_contained_cow_fixture": true,
+    "game_exe_or_dump_required_for_fixtures": false
+  },
+  "toolchain": {
+    "distribution": "llvm-mingw-20261020-ucrt-macos-universal",
+    "compiler": "Clang 23.1.4",
+    "target": "x86_64-w64-windows-gnu",
+    "builtin_marker": true,
+    "ordinal_100": "GetBehaviorValue",
+    "ordinal_101": "D3D12CreateDevice"
+  },
+  "artifact_hashes": {
+    "02-rendering/bottle/d3d12.dll": "f3038fdc146ff740fb2070d39b16945623fae3958aab963f995ae13f79d25b51",
+    "02-rendering/source/d3d12.dll": "f3038fdc146ff740fb2070d39b16945623fae3958aab963f995ae13f79d25b51",
+    "02-rendering/source/d3d12.c": "0511739497a367e521a7607114bfb555bde1d2a1c00629d06e02d541001faed0",
+    "02-rendering/source/aligned_heap_fix.h": "667fba38585d9729b117f6237eef5088b5608648f3c448aa60261c79b02e62c1",
+    "09-memory-leak/memory-leak-v1.1.patch": "e8f0f6e51c7bcdbfd601156c096cce9f0d452905d3bc0bf4cf42a8847eac8a5a"
+  },
+  "limitations": [
+    "Censuses exclude separately allocated large blocks and other heaps and are non-atomic.",
+    "Counter bytes represent cumulative traffic, not resident RAM saved.",
+    "Higher-level origin of the pointer mismatch is unresolved.",
+    "Other DLL/direct NTDLL operations are outside IAT bookkeeping coverage.",
+    "Cross-build/runtime compatibility and comprehensive new event regressions are not claimed."
+  ]
+}

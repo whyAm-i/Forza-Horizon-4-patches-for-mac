@@ -18,6 +18,7 @@ Forza Horizon 4 previously failed on Apple Silicon at three critical checkpoints
 | **Open-World Crash** | **Resolved** | Non-invasive Vectored Exception Handler (VEH) in `d3d12.dll` intercepting `0xC000001D` at `0x140D05DA0` and safely returning to caller `0x140D04D8A`. |
 | **D3DMetal Export Ordinals** | **Resolved** | Custom `d3d12.def` preserving Ordinal 100 (`GetBehaviorValue`) and Ordinal 101 (`D3D12CreateDevice`). |
 | **Free Roam Gameplay** | **Verified Working** | Spawns into open world, discovers roads, and drives continuously across sessions with zero crashes. |
+| **Driving memory leak** | **User-confirmed working (V1.1)** | Guarded aligned-buffer free repair, included in the combined shim. See [installation and measured limits](working-patches/09-memory-leak/README.md). |
 | **Drift-zone finish/exit** | **User-confirmed working (V3)** | Guarded runtime entry bypass with all normal completion/abort callbacks forwarded. See [the tested build and findings](working-patches/08-drift-zone/README.md); achievement unlocks were not independently verified. |
 
 ---
@@ -35,7 +36,7 @@ Forza Horizon 4 previously failed on Apple Silicon at three critical checkpoints
 
 ### Installation
 
-The patch binaries and install tools are located in `working-patches/`. Choose between automated AI-assisted deployment (Method A) or manual step-by-step terminal installation (Method B). Review the expected hashes and configuration before making changes. Do not apply these binaries to another CrossOver release.
+The patch binaries and install tools are located in `working-patches/`. The current combined DLL includes the memory repair and all earlier rendering/world/drift fixes. If FH4 already works and only needs the memory update, start with [09-memory-leak/INSTALL.md](working-patches/09-memory-leak/INSTALL.md); it provides a dry-run installer and rollback manifest. Choose between automated AI-assisted deployment (Method A) or manual step-by-step terminal installation (Method B). Review the expected hashes and configuration before making changes. Do not apply these binaries to another CrossOver release.
 
 ---
 
@@ -47,13 +48,13 @@ If you are using an AI coding assistant (such as Antigravity, Cursor, Claude Cod
 2. **Quit CrossOver:** Completely quit CrossOver and ensure all bottle processes are stopped.
 3. **Prompt the AI:** Copy and paste the following prompt into your AI coding assistant:
 
-> *"Please apply the Forza Horizon 4 patches to my CrossOver Steam bottle and CrossOver engine following the instructions in `working-patches/MANUAL_INSTALLATION.md`. If a patches zip file is present in `working-patches/`, extract it first. Back up existing files, deploy the patched `kernelbase.dll` and `d3d12.dll`, ensure `apd12.dll` is present, configure the `cxbottle.conf` environment variables, and verify file checksums."*
+> *"Please apply the Forza Horizon 4 patches to my CrossOver Steam bottle and CrossOver engine following the instructions in `working-patches/MANUAL_INSTALLATION.md`. If a patches zip file is present in `working-patches/`, extract it first. Back up existing files, deploy the appropriate patched DLLs, use `working-patches/09-memory-leak/install.py` for a supported shim-only upgrade, preserve the matched GPTK 4 provider (do not copy the older archived apd12.dll over it), configure the `cxbottle.conf` environment variables, and verify file checksums."*
 
 The AI assistant will autonomously:
 - Auto-detect your CrossOver application (`$CX`) and Steam bottle (`$BOTTLE`) paths.
 - Create timestamped safety backups (`*.bak_fh4_archive_*` and `cxbottle.conf.bak`).
 - Deploy the patched `kernelbase.dll` (launch / DRM loop fix) and `d3d12.dll` (vertex stride fix & VEH open-world crash bypass).
-- Verify the D3DMetal provider (`apd12.dll`) and Unix symlinks.
+- Verify and preserve the matched GPTK 4 D3DMetal provider (`apd12.dll`) and Unix symlinks; the older archived provider is not the current tested dependency.
 - Configure `cxbottle.conf` environment variables (`CX_GRAPHICS_BACKEND`, `HB_D3D12_REAL`, `HB_TSSHIM_EXPLICIT_INPUT_OFFSETS=1`, `HB_TSSHIM_FIX_WORLD_ENTRY=1`).
 - Run checksum verification against `working-patches/SHA256SUMS` to confirm a successful installation.
 
@@ -92,6 +93,7 @@ If you encounter a crash (repeatedly, not a one off thing), graphical glitch, or
 For technical architecture, troubleshooting, and advanced tools, refer to the dedicated guides in `docs/`:
 
 - **[Manual Installation Guide](working-patches/MANUAL_INSTALLATION.md)** — Step-by-step terminal commands, hash-checked copy helpers, and source compilation.
+- **[Memory repair V1.1](working-patches/09-memory-leak/README.md)** — Exact working DLL/source, portable install, verified rollback, tests and measured limits.
 - **[Drift-zone patch V3](working-patches/08-drift-zone/README.md)** — Working binary/source, install, backup/rollback, failed approaches and live findings.
 - **[Anatomy of the Patches](docs/ANATOMY_OF_PATCHES.md)** — In-depth breakdown of the code cave, vertex layout stride fix, and VEH exception handler.
 - **[Repository & Archive Layout](docs/REPOSITORY_LAYOUT.md)** — Detailed file hierarchy and directory descriptions.

@@ -596,3 +596,10 @@ The Code Cave has been rewritten with the mathematically perfect 56-character st
 - V3 local deployment preserved the prior V2.1 DLLs in `${GAME_ROOT}/drift-zone-work/backup-followup-20261031-114550/`; the original pre-drift road/speed-zone DLLs remain in `backup-20261030-193739/`. The V2.1 backup is failed-experiment history, not the recommended working rollback.
 - The successful graphics environment used CrossOver 26.3 / GPTK 4.0 beta 3 with provider SHA-256 `32c942ed368a45e58d35f4da3de3776d1f74e785731de9cf6a5e705a2925488a`. The older archived provider is unchanged and must not overwrite that matched runtime during a drift-only upgrade.
 - Refreshed the archive manifest/checksum inventory, including previously missing tracked speed-zone evidence/source copies and stale metadata from earlier commits. Packaging did not reinstall files into the working game.
+
+
+## 2026-11-01 — aligned-buffer memory repair V1.1
+
+- The memory repair adds two guarded process IAT pointers and bounded provenance tracking; it never edits the game EXE file.
+- Added a parameterized dry-run paired installer/rollback with verified backups, recovery journal, build/game/provider checks and no dependency on local investigation folders.
+- Added portable allocator/COW fixtures, source build and source diff. Both page-type suites passed 423 cases and 80000 concurrent allocation/free pairs; the loader, rendering/drift and 12 installer tests also passed.

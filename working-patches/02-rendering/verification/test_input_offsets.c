@@ -1,4 +1,4 @@
-#include "../../highball_repo/spike/tsshim/d3d12.c"
+#include "../source/d3d12.c"
 #include <assert.h>
 
 static UINT expected[32], expected_count;

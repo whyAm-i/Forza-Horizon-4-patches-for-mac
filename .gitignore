@@ -71,3 +71,11 @@
 # Generated drift verification/rebuild output; working DLL is in 02-rendering
 /working-patches/08-drift-zone/build/
 /working-patches/08-drift-zone/verification/*.exe
+
+# Generated memory-fix builds, test executables, install backups and Python caches
+/working-patches/09-memory-leak/build/
+/working-patches/09-memory-leak/verification/*.exe
+/working-patches/09-memory-leak/verification/*.dll
+**/__pycache__/
+*.pyc
+**/fh4-patch-backups/

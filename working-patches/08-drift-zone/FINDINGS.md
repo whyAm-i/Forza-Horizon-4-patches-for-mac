@@ -1,3 +1,5 @@
+> Historical V3 investigation, 31 October 2026. The V3-only hash below has since been superseded in the current combined release by [memory repair V1.1](../09-memory-leak/README.md). The recorded V3 behavior and its code remain unchanged.
+
 # Drift-zone investigation and findings
 
 Recorded 31 October 2026. Addresses are RVAs in the tested FH4 `1.478.564.0` image, base `0x140000000`. They are compatibility observations for this executable, not portable function offsets.

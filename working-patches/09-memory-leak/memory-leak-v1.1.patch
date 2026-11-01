@@ -1,0 +1,261 @@
+--- a/working-patches/02-rendering/source/d3d12.c
++++ b/working-patches/02-rendering/source/d3d12.c
+@@ -2797,6 +2797,7 @@
+ static void drift_arm_first_chance(void);
+ static void drift_disarm_first_chance(void);
+ static void drift_start_event_gate(void);
++static void ah_start(void);
+ static void drift_remove_event_gate(void);
+ 
+ // ---- exports -------------------------------------------------------------------------------
+@@ -2811,6 +2812,7 @@
+     if (SUCCEEDED(hr) && out && *out) {
+         drift_arm_first_chance();
+         drift_start_event_gate();
++        ah_start();
+     }
+     if (SUCCEEDED(hr) && out && *out && !idle) {
+         ID3D12Device *dev = NULL; IUnknown *u = (IUnknown *)*out;
+@@ -2912,6 +2914,7 @@
+ }
+ 
+ #include "drift_event_gate.h"
++#include "aligned_heap_fix.h"
+ #include "drift_capture.h"
+ 
+ static PVOID g_veh_world_entry_fix = NULL;
+--- /dev/null
++++ b/working-patches/02-rendering/source/aligned_heap_fix.h
+@@ -0,0 +1,232 @@
++#ifndef FH4_ALIGNED_HEAP_FIX_H
++#define FH4_ALIGNED_HEAP_FIX_H
++#include <stdint.h>
++#include <intrin.h>
++
++/* Experimental FH4 1.478.564.0 compatibility fix. Only the game's two heap
++ * import DATA slots change; executable instructions and the EXE file do not.
++ * A bounded provenance table is mandatory: pointer[-1] alone is not evidence.
++ * This is not protection against arbitrary application use-after-free. Other
++ * modules calling NTDLL directly are outside this IAT observer's coverage. */
++#define AH_ALLOC_RET 0x37fe7c3u
++#define AH_FREE_RET  0x37fe9adu
++#define AH_ALLOC_IAT 0x8820390u
++#define AH_FREE_IAT  0x8820388u
++#define AH_CAPACITY 32768u
++#define AH_PROBES 32u
++typedef LPVOID (WINAPI *AhAlloc)(HANDLE,DWORD,SIZE_T);
++typedef BOOL (WINAPI *AhFree)(HANDLE,DWORD,LPVOID);
++typedef struct { uintptr_t aligned,raw; HANDLE heap; SIZE_T bytes; } AhRecord;
++static AhRecord ah_records[AH_CAPACITY];
++static SRWLOCK ah_lock=SRWLOCK_INIT;
++static AhAlloc ah_original_alloc;
++static AhFree ah_original_free;
++static uintptr_t ah_base;
++static HANDLE ah_heap;
++static volatile LONG ah_started,ah_enabled;
++static volatile LONG64 ah_tracked,ah_repaired,ah_bytes,ah_dropped,ah_rejected;
++static volatile LONG ah_log_count;
++static const BYTE ah_alloc_signature[]={
++    0x48,0x8b,0x8f,0x88,0xcf,0,0,0x4c,0x8b,0xc6,0x33,0xd2,0x48,0x89,0x5c,0x24,0x30,
++    0xff,0x15,0xcd,0x1b,0x02,0x05,0x44,0x0f,0xb6,0x4f,0x18,0x44,0x0f,0xb7,0xc5,
++    0x48,0x8b,0xc8,0x48,0x8b,0xd6,0x48,0x8b,0xd8,0xe8,0xb6,0xe8,0xff,0xff};
++static const BYTE ah_free_signature[]={
++    0x45,0x33,0xc0,0x33,0xd2,0x48,0x8b,0xcb,0xe8,0xc5,0xea,0xff,0xff,
++    0x48,0x8b,0x8f,0x88,0xcf,0,0,0x4c,0x8b,0xc3,0x33,0xd2,0xff,0x15,0xdb,0x19,0x02,0x05,
++    0x48,0x8b,0x5c,0x24,0x30,0x48,0x83,0xc4,0x20,0x5f,0xc3};
++static BOOL ah_read(uintptr_t address,void *out,SIZE_T bytes) {
++    SIZE_T n=0;
++    return ReadProcessMemory(GetCurrentProcess(),(void*)address,out,bytes,&n)&&n==bytes;
++}
++static void ah_log(const char *message) {
++    DWORD saved=GetLastError();
++    if(InterlockedIncrement(&ah_log_count)<=96) {
++        char path[MAX_PATH],line[640];DWORD n;
++        CreateDirectoryA("C:\\highball",NULL);CreateDirectoryA("C:\\highball\\logs",NULL);
++        snprintf(path,sizeof(path),"C:\\highball\\logs\\aligned-heap-fix-%lu.txt",(unsigned long)GetCurrentProcessId());
++        int length=snprintf(line,sizeof(line),"FH4_ALIGNED_HEAP_FIX v1.1: %s\r\n",message);
++        HANDLE file=CreateFileA(path,FILE_APPEND_DATA,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
++        if(file!=INVALID_HANDLE_VALUE) {
++            if(length>0&&length<(int)sizeof(line))WriteFile(file,line,(DWORD)length,&n,NULL);
++            CloseHandle(file);
++        }
++    }
++    SetLastError(saved);
++}
++static uintptr_t ah_align(uintptr_t raw) { return (raw+39u)&~(uintptr_t)31u; }
++static BOOL ah_size(SIZE_T n) { return n==4135||n==8231||n==16423||n==32807; }
++static unsigned ah_hash(uintptr_t key) {
++    key>>=5;key^=key>>17;key*=0x9e3779b97f4a7c15ULL;key^=key>>32;
++    return (unsigned)key&(AH_CAPACITY-1);
++}
++/* All table operations require ah_lock. Probe through holes after deletion. */
++static AhRecord *ah_lookup(uintptr_t key) {
++    unsigned h=ah_hash(key);
++    for(unsigned i=0;i<AH_PROBES;i++) {
++        AhRecord *r=&ah_records[(h+i)&(AH_CAPACITY-1)];
++        if(r->aligned==key&&key)return r;
++    }
++    return NULL;
++}
++static void ah_forget_raw(uintptr_t raw) {
++    AhRecord *r=ah_lookup(ah_align(raw));
++    if(r&&r->raw==raw)memset(r,0,sizeof(*r));
++}
++static void ah_record(HANDLE heap,void *raw,SIZE_T bytes) {
++    uintptr_t key=ah_align((uintptr_t)raw);unsigned h=ah_hash(key);
++    for(unsigned i=0;i<AH_PROBES;i++) {
++        AhRecord *r=&ah_records[(h+i)&(AH_CAPACITY-1)];
++        if(!r->aligned) {
++            *r=(AhRecord){key,(uintptr_t)raw,heap,bytes};
++            InterlockedIncrement64(&ah_tracked);return;
++        }
++    }
++    InterlockedIncrement64(&ah_dropped); /* Fail closed; never evict a live record. */
++}
++static void *ah_alloc_impl(HANDLE heap,DWORD flags,SIZE_T bytes,uintptr_t caller) {
++    /* The result is not published to the caller until bookkeeping completes.
++       Allocate outside the observer lock: exceptions retain normal semantics
++       and unrelated heap allocations need not serialize on this table. */
++    void *raw=ah_original_alloc(heap,flags,bytes);DWORD saved=GetLastError();
++    AcquireSRWLockExclusive(&ah_lock);
++    if(raw) {
++        ah_forget_raw((uintptr_t)raw);
++        if(!flags&&heap==ah_heap&&caller==ah_base+AH_ALLOC_RET&&ah_size(bytes))ah_record(heap,raw,bytes);
++    }
++    ReleaseSRWLockExclusive(&ah_lock);SetLastError(saved);return raw;
++}
++static BOOL ah_free_impl(HANDLE heap,DWORD flags,void *pointer,uintptr_t caller) {
++    DWORD entry_error=GetLastError();BOOL repaired=FALSE,result;SIZE_T bytes=0;
++    AcquireSRWLockExclusive(&ah_lock);
++    AhRecord *r=ah_lookup((uintptr_t)pointer);
++    /* Only consult memory inside a recorded allocation. Our SRW lock covers
++       observed calls; HeapLock additionally protects serialized heap paths.
++       Wine LFH fast paths from other modules remain outside our coverage. */
++    if(InterlockedCompareExchange(&ah_enabled,0,0)&&!flags&&heap==ah_heap&&
++       caller==ah_base+AH_FREE_RET&&r&&r->heap==heap&&
++       ((uintptr_t)pointer-r->raw==16||(uintptr_t)pointer-r->raw==32)&&HeapLock(heap)) {
++        uintptr_t raw=0;
++        if(HeapValidate(heap,0,(void*)r->raw)&&HeapSize(heap,0,(void*)r->raw)==r->bytes&&
++           ah_read((uintptr_t)pointer-sizeof(raw),&raw,sizeof(raw))&&raw==r->raw) {
++            bytes=r->bytes;SetLastError(entry_error);
++            result=ah_original_free(heap,flags,(void*)raw);
++            DWORD saved=GetLastError();
++            if(result){memset(r,0,sizeof(*r));repaired=TRUE;}
++            HeapUnlock(heap);SetLastError(saved);
++        } else {
++            InterlockedIncrement64(&ah_rejected);HeapUnlock(heap);
++            /* A stale record must never authorize a later reuse of this slot. */
++            memset(r,0,sizeof(*r));ReleaseSRWLockExclusive(&ah_lock);SetLastError(entry_error);
++            return ah_original_free(heap,flags,pointer);
++        }
++    } else {
++        AhRecord *raw_record=ah_lookup(ah_align((uintptr_t)pointer));
++        if(!pointer||!raw_record||raw_record->raw!=(uintptr_t)pointer||raw_record->heap!=heap) {
++            /* Unrecognized inputs, including faults raised by the original API,
++               pass through with no observer lock held. */
++            ReleaseSRWLockExclusive(&ah_lock);SetLastError(entry_error);
++            return ah_original_free(heap,flags,pointer);
++        }
++        SetLastError(entry_error);result=ah_original_free(heap,flags,pointer);
++        if(result)memset(raw_record,0,sizeof(*raw_record));
++    }
++    DWORD saved=GetLastError();ReleaseSRWLockExclusive(&ah_lock);
++    if(repaired) {
++        LONG64 count=InterlockedIncrement64(&ah_repaired);
++        InterlockedAdd64(&ah_bytes,(LONG64)bytes);
++        if(count<=8||(count%4096)==0) {
++            char line[320];snprintf(line,sizeof(line),"repaired=%lld; requested_bytes=%lld; tracked_total=%lld; table_drops=%lld; metadata_rejections=%lld",
++                count,InterlockedCompareExchange64(&ah_bytes,0,0),InterlockedCompareExchange64(&ah_tracked,0,0),
++                InterlockedCompareExchange64(&ah_dropped,0,0),InterlockedCompareExchange64(&ah_rejected,0,0));
++            ah_log(line);
++        }
++    }
++    SetLastError(saved);return result;
++}
++__attribute__((noinline)) static LPVOID WINAPI ah_alloc_hook(HANDLE heap,DWORD flags,SIZE_T bytes) {
++    return ah_alloc_impl(heap,flags,bytes,(uintptr_t)__builtin_return_address(0));
++}
++__attribute__((noinline)) static BOOL WINAPI ah_free_hook(HANDLE heap,DWORD flags,LPVOID pointer) {
++    return ah_free_impl(heap,flags,pointer,(uintptr_t)__builtin_return_address(0));
++}
++static BOOL ah_matches(uintptr_t address,const void *expected,SIZE_T size) {
++    BYTE bytes[64];return size<=sizeof(bytes)&&ah_read(address,bytes,size)&&!memcmp(bytes,expected,size);
++}
++static DWORD ah_writable_protection(DWORD protection) {
++    /* FH4's recorded IAT is inside a PAGE_EXECUTE_WRITECOPY image region.
++       Preserve execute permission during the brief data-slot update, then
++       restore the exact original protection. Reject modifiers/guard pages. */
++    switch(protection) {
++        case PAGE_READONLY:case PAGE_READWRITE:case PAGE_WRITECOPY:return PAGE_READWRITE;
++        case PAGE_EXECUTE_READ:case PAGE_EXECUTE_READWRITE:case PAGE_EXECUTE_WRITECOPY:return PAGE_EXECUTE_READWRITE;
++        default:return 0;
++    }
++}
++/* 1 installed, 0 still encrypted/unready, -1 disabled/unsupported/error. */
++static int ah_install(uintptr_t base) {
++    if(InterlockedCompareExchange(&ah_enabled,0,0))return 1;
++    char env[8];
++    if(GetEnvironmentVariableA("HB_TSSHIM_FIX_ALIGNED_HEAP",env,sizeof(env))>0&&env[0]=='0')return -1;
++    IMAGE_DOS_HEADER dos;IMAGE_NT_HEADERS64 nt;
++    if(!ah_read(base,&dos,sizeof(dos))||dos.e_magic!=IMAGE_DOS_SIGNATURE||dos.e_lfanew<0||dos.e_lfanew>0x10000||
++       !ah_read(base+dos.e_lfanew,&nt,sizeof(nt))||nt.Signature!=IMAGE_NT_SIGNATURE||
++       nt.FileHeader.Machine!=IMAGE_FILE_MACHINE_AMD64||nt.FileHeader.TimeDateStamp!=0x655e0821||
++       nt.OptionalHeader.Magic!=IMAGE_NT_OPTIONAL_HDR64_MAGIC||nt.OptionalHeader.SizeOfImage!=0x9b10e00)return -1;
++    if(!ah_matches(base+0x37fe7ac,ah_alloc_signature,sizeof(ah_alloc_signature))||
++       !ah_matches(base+0x37fe98e,ah_free_signature,sizeof(ah_free_signature)))return 0;
++    PVOID volatile *alloc_slot=(PVOID volatile *)(base+AH_ALLOC_IAT);
++    PVOID volatile *free_slot=(PVOID volatile *)(base+AH_FREE_IAT);
++    HMODULE kernel=GetModuleHandleA("kernel32.dll");PVOID targets[2];
++    PVOID alloc=(PVOID)GetProcAddress(kernel,"HeapAlloc"),free_fn=(PVOID)GetProcAddress(kernel,"HeapFree");
++    if(!alloc||!free_fn||!ah_read((uintptr_t)free_slot,targets,sizeof(targets))||targets[0]!=free_fn||targets[1]!=alloc)return -1;
++    MEMORY_BASIC_INFORMATION mbi;
++    if(!VirtualQuery((void*)free_slot,&mbi,sizeof(mbi))||mbi.State!=MEM_COMMIT||mbi.AllocationBase!=(void*)base||
++       !ah_writable_protection(mbi.Protect)||
++       (uintptr_t)mbi.BaseAddress+mbi.RegionSize<base+AH_ALLOC_IAT+sizeof(void*)) {
++        ah_log("IAT memory protection/range guard declined installation");return -1;
++    }
++    DWORD writable=ah_writable_protection(mbi.Protect);
++    /* Pin before publishing a callback: DLL unloading cannot race an in-flight
++       heap call. Rollback is a process restart plus restoring the backed-up DLL. */
++    HMODULE pinned=NULL;
++    if(!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS|GET_MODULE_HANDLE_EX_FLAG_PIN,
++        (LPCSTR)(uintptr_t)ah_alloc_hook,&pinned))return -1;
++    ah_base=base;ah_heap=GetProcessHeap();ah_original_alloc=(AhAlloc)alloc;ah_original_free=(AhFree)free_fn;
++    DWORD protection,ignored;
++    if(!VirtualProtect((void*)free_slot,2*sizeof(void*),writable,&protection))return -1;
++    BOOL a=InterlockedCompareExchangePointer(alloc_slot,(PVOID)ah_alloc_hook,alloc)==alloc;
++    BOOL f=a&&InterlockedCompareExchangePointer(free_slot,(PVOID)ah_free_hook,free_fn)==free_fn;
++    BOOL p=VirtualProtect((void*)free_slot,2*sizeof(void*),protection,&ignored);
++    if(!a||!f||!p) {
++        if(VirtualProtect((void*)free_slot,2*sizeof(void*),writable,&ignored)) {
++            if(f)InterlockedCompareExchangePointer(free_slot,free_fn,(PVOID)ah_free_hook);
++            if(a)InterlockedCompareExchangePointer(alloc_slot,alloc,(PVOID)ah_alloc_hook);
++            VirtualProtect((void*)free_slot,2*sizeof(void*),protection,&ignored);
++        }
++        ah_log("installation failed; repair remains disabled");return -1;
++    }
++    InterlockedExchange(&ah_enabled,1);
++    ah_log("installed guarded allocation-provenance repair; 1 MiB fixed table; only two game IAT data slots changed; restart required for rollback");
++    return 1;
++}
++static DWORD WINAPI ah_worker(void *module) {
++    int result=0;
++    for(unsigned i=0;i<1200&&result==0;i++){Sleep(250);result=ah_install((uintptr_t)GetModuleHandleA(NULL));}
++    if(result!=1)ah_log("disabled, unsupported, or signatures not ready; no repair enabled");
++    FreeLibraryAndExitThread((HMODULE)module,0);return 0;
++}
++static void ah_start(void) {
++    if(InterlockedCompareExchange(&ah_started,1,0))return;
++    char path[MAX_PATH]={0};DWORD n=GetModuleFileNameA(NULL,path,sizeof(path));
++    if(!n||n>=sizeof(path))return;
++    const char *name=strrchr(path,'\\');name=name?name+1:path;
++    if(_stricmp(name,"ForzaHorizon4.exe"))return;
++    int result=ah_install((uintptr_t)GetModuleHandleA(NULL));
++    if(result<0)ah_log("disabled or unsupported executable/import state; no repair enabled");
++    if(result!=0)return;
++    HMODULE module=NULL;
++    if(!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,(LPCSTR)(uintptr_t)ah_worker,&module))return;
++    HANDLE thread=CreateThread(NULL,0,ah_worker,module,0,NULL);
++    if(thread)CloseHandle(thread);else FreeLibrary(module);
++}
++#endif
