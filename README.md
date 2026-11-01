@@ -1,6 +1,9 @@
 # Forza Horizon 4 on Apple Silicon
 
----
+## Important
+This environment variable keeps debug info and rapidly fill storage if kept enabled. Make sure to remove this environment variable from the cxbottle.conf(file path- ~/Library/"Application Support"/CrossOver/Bottles/"Your Bottle Name")(log file location- cd ~/Library/"Application Support"/CrossOver/Bottles/"Your Bottle Name"/drive_c/highball/logs ). Use this variable only for debugging.
+
+"HB_TSSHIM_DEBUG" = "1"
 
 ## Current Status
 
