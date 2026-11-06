@@ -1,0 +1,31 @@
+{
+  "verified_on": "2026-11-06",
+  "runtime": "CrossOver 26.3 x64 on Apple Silicon",
+  "file": "advapi32.dll",
+  "stock_sha256": "0375c2ee0e61be9fc3064a07b52f65e73d8a74b06fd06b59ea9e958365a33940",
+  "patched_sha256": "754810ac719c869aeec9a4d94b9ae0591e3b27abeb77c88bf8bd6ac8fd71ae5e",
+  "targets": [
+    "lib/wine/x86_64-windows/advapi32.dll",
+    "drive_c/windows/system32/advapi32.dll"
+  ],
+  "probe": {
+    "stock": {
+      "specific_lookups": ["device key", "device token", "title ticket"],
+      "specific_lookup_count_each": 1,
+      "enumeration_error": 1168,
+      "broad_xbox_lookup_count": 7,
+      "successful_direct_reads": 8
+    },
+    "patched": {
+      "specific_lookup_count_each": 1,
+      "broad_xbox_lookup_count": 7,
+      "enumeration_error": 0,
+      "missing_entry_control": {"count": 0, "error": 1168}
+    }
+  },
+  "gameplay": {
+    "status": "owner-confirmed working",
+    "report": "it's working flawlessly",
+    "scope": "Online play in the tested CrossOver setup. Individual online modes were not independently enumerated."
+  }
+}

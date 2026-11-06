@@ -31,6 +31,7 @@ This page describes the files committed to Git. The archive manifest and checksu
     ├── 07-evidence/                   # reports, notices, licenses, and provenance
     ├── 08-drift-zone/                 # V3 install, backup/rollback, findings, diff, tests
     ├── 09-memory-leak/                # V1.1 install/rollback, source diff, build and portable tests
+    ├── 10-online/                     # credential patch generator, install/rollback and validation
     ├── APPLY.md
     ├── MANUAL_INSTALLATION.md
     ├── README.md
@@ -49,6 +50,7 @@ This page describes the files committed to Git. The archive manifest and checksu
 - `07-evidence` contains the checked-in investigation reports and notices. Runtime logs and other local diagnostic captures are excluded.
 - `08-drift-zone` contains drift fix and includes a reviewable baseline source diff and synthetic callback/ABI verification source. Its integrated source and exact working DLL are in `02-rendering`; generated builds, dumps, logs, saves and game code snapshots are excluded.
 - `09-memory-leak` contains the aligned-buffer repair documentation, parameterized paired installer/rollback, source diff, validation summary and self-contained allocator/COW fixtures. Its exact binary and integrated source live in `02-rendering`; builds, installation backups and runtime logs are excluded.
+- `10-online` contains the hash-checked credential patch generator, install and rollback instructions, and the verification summary. The user generates `advapi32.dll` from the installed CrossOver runtime.
 - `manifest.json` and `SHA256SUMS` cover the tracked package files. `tools/verify_archive.py` verifies this Git-delivered set; ignored local files do not affect the result.
 
 The installed CrossOver 26.3 Apple GPTK runtime remains a prerequisite and is not bundled here. See [the provenance audit](CROSSOVER_PROVENANCE_AUDIT.md) for the dependency rationale.

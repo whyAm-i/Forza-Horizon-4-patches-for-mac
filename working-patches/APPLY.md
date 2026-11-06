@@ -4,6 +4,8 @@ These instructions restore the **captured CrossOver 26.3 setup**, including memo
 
 For a working bottle needing the memory update, use [09-memory-leak/INSTALL.md](09-memory-leak/INSTALL.md). For background on the retained drift behavior, use [08-drift-zone/INSTALL.md](08-drift-zone/INSTALL.md) and preserve the existing GPTK provider. The V3 gameplay confirmation used GPTK 4.0 beta 3; the archived provider is an older baseline. Use the current custom shim in this archive and preserve the required matched provider already installed. Original sources/scripts are reference material; running every historical patch would combine incompatible experiments.
 
+For the Live configuration connection failure after Xbox sign-in, use [10-online/INSTALL.md](10-online/INSTALL.md). It generates the separate credential patch from the supported stock CrossOver DLL.
+
 ## 1. Prepare and verify
 
 1. Quit Forza and close applications in the Steam bottle through CrossOver. An existing process retains its loaded DLLs; live replacement is not an application method.

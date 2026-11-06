@@ -1,6 +1,8 @@
 # Forza Horizon 4 on Apple Silicon
 
 ## Important
+Horizon online is a buggy mess right now. It's more for signing in online claiming some backstage cars and playing horizon solo(using play horiozn solo button).
+
 This environment variable keeps debug info and rapidly fill storage if kept enabled. Make sure to remove this environment variable from the cxbottle.conf(file path- ~/Library/"Application Support"/CrossOver/Bottles/"Your Bottle Name")(log file location- cd ~/Library/"Application Support"/CrossOver/Bottles/"Your Bottle Name"/drive_c/highball/logs ). Use this variable only for debugging.
 
 "HB_TSSHIM_DEBUG" = "1"
@@ -23,6 +25,7 @@ Forza Horizon 4 previously failed on Apple Silicon at three critical checkpoints
 | **Free Roam Gameplay** | **Verified Working** | Spawns into open world, discovers roads, and drives continuously across sessions with zero crashes. |
 | **Driving memory leak** | **User-confirmed working (V1.1)** | Guarded aligned-buffer free repair, included in the combined shim. See [installation and measured limits](working-patches/09-memory-leak/README.md). |
 | **Drift-zone finish/exit** | **User-confirmed working (V3)** | Guarded runtime entry bypass with all normal completion/abort callbacks forwarded. See [the tested build and findings](working-patches/08-drift-zone/README.md); achievement unlocks were not independently verified. |
+| **Online play / Live configuration** | **User-confirmed working** | Corrects CrossOver's Xbox credential lookup when the macOS Keychain search is empty. See [the online credential fix](working-patches/10-online/README.md). |
 
 ---
 
@@ -40,6 +43,8 @@ Forza Horizon 4 previously failed on Apple Silicon at three critical checkpoints
 ### Installation
 
 The patch binaries and install tools are located in `working-patches/`. The current combined DLL includes the memory repair and all earlier rendering/world/drift fixes. If FH4 already works and only needs the memory update, start with [09-memory-leak/INSTALL.md](working-patches/09-memory-leak/INSTALL.md); it provides a dry-run installer and rollback manifest. Choose between automated AI-assisted deployment (Method A) or manual step-by-step terminal installation (Method B). Review the expected hashes and configuration before making changes. Do not apply these binaries to another CrossOver release.
+
+If FH4 already launches but online play fails at Live configuration, see [10-online/INSTALL.md](working-patches/10-online/INSTALL.md) for the separate credential patch.
 
 ---
 
@@ -98,6 +103,7 @@ For technical architecture, troubleshooting, and advanced tools, refer to the de
 - **[Manual Installation Guide](working-patches/MANUAL_INSTALLATION.md)** — Step-by-step terminal commands, hash-checked copy helpers, and source compilation.
 - **[Memory repair V1.1](working-patches/09-memory-leak/README.md)** — Exact working DLL/source, portable install, verified rollback, tests and measured limits.
 - **[Drift-zone patch V3](working-patches/08-drift-zone/README.md)** — Working binary/source, install, backup/rollback, failed approaches and live findings.
+- **[Online credential fix](working-patches/10-online/README.md)** — Reproducible CrossOver DLL patch, installation, rollback and in-game confirmation.
 - **[Anatomy of the Patches](docs/ANATOMY_OF_PATCHES.md)** — In-depth breakdown of the code cave, vertex layout stride fix, and VEH exception handler.
 - **[Repository & Archive Layout](docs/REPOSITORY_LAYOUT.md)** — Detailed file hierarchy and directory descriptions.
 - **[Verification & Runtime Diagnostics](docs/VERIFICATION_AND_DIAGNOSTICS.md)** — Checksum validation and log verification steps.

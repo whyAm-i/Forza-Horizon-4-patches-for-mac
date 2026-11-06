@@ -298,8 +298,8 @@
     },
     "07-evidence/changes_log.md": {
       "type": "file",
-      "size": 64671,
-      "sha256": "0b3f05dec7374632d6c115c698703409e116b24a56c3c17fd02d211ab19b6ccb",
+      "size": 64104,
+      "sha256": "b6743cdf58bd52cff727d5c9ae8a39e20555596ff1934e3a26a596b8ca8ed52d",
       "source": "${GAME_ROOT}/changes_log.md"
     },
     "07-evidence/diagnostic-deployment-README.md": {
@@ -512,22 +512,46 @@
       "sha256": "7b81b1dd00825654f9ef46f1829b94125a0d58c12fee7297dfc8b6255d2d18b4",
       "source": "Memory repair V1.1, portable source/tools and owner-confirmed gameplay (2026-11-01)"
     },
+    "10-online/INSTALL.md": {
+      "type": "file",
+      "source": "Online credential fix, verified CrossOver 26.3 probe and owner-confirmed online play (2026-11-06)",
+      "size": 3268,
+      "sha256": "2a7461abe895f62da69480f5398b47854731048420ac1368982126d69be1bb94"
+    },
+    "10-online/README.md": {
+      "type": "file",
+      "source": "Online credential fix, verified CrossOver 26.3 probe and owner-confirmed online play (2026-11-06)",
+      "size": 2615,
+      "sha256": "14b4a7a5344389702bd66b6053151e1be9e1f4a15188ff2bacb43f77303d94aa"
+    },
+    "10-online/patch_credential_enumeration.py": {
+      "type": "file",
+      "source": "Online credential fix, verified CrossOver 26.3 probe and owner-confirmed online play (2026-11-06)",
+      "size": 2498,
+      "sha256": "bdc18ce966911c9d01fc34b1b49911c71abe850f42e0dcca559872600a243992"
+    },
+    "10-online/validation.json": {
+      "type": "file",
+      "source": "Online credential fix, verified CrossOver 26.3 probe and owner-confirmed online play (2026-11-06)",
+      "size": 1058,
+      "sha256": "8df7809a0775684354af8eb100346f32a5b313c4d4116896cb7524bce197ae37"
+    },
     "APPLY.md": {
       "type": "file",
-      "size": 12877,
-      "sha256": "719b66e61f06a5eeb1158de330efea03f54389f1cbcba9893ffeaae017eea95b",
+      "size": 13077,
+      "sha256": "64ed8aa05d74c7a415aeb2231ca14e57b7274251b8fac66cdf6290fd3269c54a",
       "source": "generated"
     },
     "MANUAL_INSTALLATION.md": {
       "type": "file",
-      "size": 6143,
-      "sha256": "df831e0d17ec7044178064a2f3a0f1801bd0078bbfcf2971e4abb1b8edcd8a67",
+      "size": 6353,
+      "sha256": "a1a73d3a5a595ed3c6dd6428805f59282da7215b4896023e45bbe21f7c1118be",
       "source": "generated"
     },
     "README.md": {
       "type": "file",
-      "size": 7019,
-      "sha256": "bb6889bfe1e8bafb211dad518a147a42294a5e95bda0ec8ed7aad0bec4e639e6",
+      "size": 7377,
+      "sha256": "0c3ab1bdd9ddc3abd330cac1e30bda36628654873e253393c5ca0eaca6f71668",
       "source": "generated"
     },
     "tools/copy_checked.py": {
@@ -543,12 +567,12 @@
       "source": "generated"
     }
   },
-  "updated_at": "2026-10-31",
+  "updated_at": "2026-11-06",
   "latest_patch": {
-    "name": "Drift observer V3",
+    "name": "Online credential enumeration fix",
     "status": "owner-confirmed working",
-    "guide": "08-drift-zone/README.md",
-    "shim_sha256": "833b964203e1e157a162852863656e0e4934ef10a3659d3047ebd0422b529f66"
+    "guide": "10-online/README.md",
+    "advapi32_sha256": "754810ac719c869aeec9a4d94b9ae0591e3b27abeb77c88bf8bd6ac8fd71ae5e"
   },
-  "current_release": "FH4 aligned-buffer repair V1.1 plus retained drift V3/rendering/world fixes"
+  "current_release": "FH4 online credential fix and aligned-buffer repair V1.1 with retained drift V3/rendering/world fixes"
 }

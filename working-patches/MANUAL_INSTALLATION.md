@@ -8,6 +8,8 @@ The helper validates target hashes and creates unique timestamped backups (`*.ba
 
 **Memory/shim-only upgrade:** use [09-memory-leak/INSTALL.md](09-memory-leak/INSTALL.md) for the current paired dry-run installer and rollback manifest.
 
+**Online credential fix:** use [10-online/INSTALL.md](10-online/INSTALL.md) to generate the patched `advapi32.dll` from your local CrossOver installation, review both target hashes, and make verified backups.
+
 **Retained drift behavior:** if the game already launches and renders correctly, use [08-drift-zone/INSTALL.md](08-drift-zone/INSTALL.md). It updates only the two shim copies and preserves the working GPTK 4 provider, launch patch, graphics settings and saves.
 
 ---

@@ -8,6 +8,8 @@ Updated 31 October 2026 with the user-confirmed **drift-zone V3** shim. `02-rend
 
 The current combined shim also includes [memory repair V1.1](09-memory-leak/README.md), user-confirmed working on 1 November 2026. Its portable installer upgrades an existing supported setup without replacing the provider or changing settings. The older provider remains historical baseline material.
 
+The separate [online credential fix](10-online/README.md) is a buggy mess with pther patches. It repairs the CrossOver credential lookup used after Xbox sign-in.
+
 ## What is included
 
 | Folder | What it does | Verification / status |
@@ -21,6 +23,7 @@ The current combined shim also includes [memory repair V1.1](09-memory-leak/READ
 | `07-evidence` | Selected investigation findings, verification notes, notices and licenses | Supporting records; runtime logs and other local diagnostic captures are excluded. |
 | `09-memory-leak` | Guarded aligned-buffer free repair V1.1, dry-run paired installer/rollback, source diff and portable tests | User-confirmed working; live repaired-free counters and approximately stable occupied heap during continued driving. Total footprint growth is not claimed eliminated. |
 | `08-drift-zone` | V3 installation, backup/rollback, findings, source diff and portable callback/ABI test | User reported “it's working flawlessly” after the final gameplay test. All normal callbacks are forwarded; the exact failing entry is bypassed in memory. |
+| `10-online` | Hash-checked generator for the CrossOver x64 `advapi32.dll` credential fix, installation and rollback | Credential probes passed and the owner confirmed online play. |
 
 In the captured game folder, the live EXE was byte-for-byte identical to its `ForzaHorizon4.exe.bak` (SHA-256 `b838a79a65c6d1e12f46deaba3584e4c88ebccdfdc4214b4535ece4ba3c0abbe`). **There is no on-disk EXE patch to apply.** The drift entry change is applied only inside the running process, after its exact runtime signature matches. `kernel32.dll` also matches its saved backup; the old GetPackagePath export-edit scripts are not part of this installed workaround. The latest crash log still reported the missing GetPackagePath implementation during startup.
 
